@@ -197,52 +197,53 @@ function Index() {
 function Cheatsheet({ langId }: { langId: string }) {
   const rows: Record<string, Array<[string, string]>> = {
     en: [
-      ["Assign", `Let x be 5.  /  Set x to "hi".`],
-      ["Arithmetic", `Set x to 3 plus 4 times 2.`],
-      ["Mutate", `Add 1 to x.  /  Increase x by 1.`],
-      ["Print", `Print x.  /  Show "hello".`],
-      ["If", `If x is greater than 3, print x.`],
-      ["Repeat", `Repeat 5 times: add 1 to x.`],
+      ["Assign", `Let x be 5.  /  Set x to "hi".  /  Define score as 0.\nSuppose age is 30.  /  Now total becomes 100.\nCreate a variable called name with the value "Ana".\nStore 42 in answer.  /  Assign 7 to lucky.`],
+      ["Arithmetic", `Set x to 3 plus 4 times 2 minus 1.\nLet greeting be "Hello, " plus name.`],
+      ["Mutate", `Add 1 to x.  /  Increase x by 1.  /  Bump x by 2.\nGive x 5 more.  /  Take 3 away from x.  /  Reduce x by 1.`],
+      ["Print", `Print x.  /  Show me the value of x.\nKindly display "hello".  /  Tell me about score.\nWhat is x?  /  Announce "done".`],
+      ["If", `If x is greater than 3, then print x.\nWhenever score is at least 100, say "win!".\nProvided that age is at most 17, print "minor".`],
+      ["Repeat", `Repeat 5 times: please add 1 to x.\nDo the following 3 times: print "hi".\n4 times in a row, increase x by 2.`],
     ],
     es: [
-      ["Asignar", `Sea x igual a 5.`],
-      ["Aritmética", `Sea y igual a 3 más 4 por 2.`],
-      ["Mutar", `Suma 1 a x.  /  Aumenta x en 1.`],
-      ["Mostrar", `Muestra x.`],
-      ["Si", `Si x es mayor que 3, muestra x.`],
-      ["Repetir", `Repite 5 veces: suma 1 a x.`],
+      ["Asignar", `Sea x igual a 5.  /  Define score como 0.\nSupongamos que edad es 30.  /  Ahora total se convierte en 100.\nCrea una variable llamada nombre con el valor "Ana".\nGuarda 42 en respuesta.  /  Asigna 7 a suerte.`],
+      ["Aritmética", `Sea y igual a 3 más 4 por 2 menos 1.`],
+      ["Mutar", `Suma 1 a x.  /  Aumenta x en 1.\nDale a x 5 más.  /  Quita 3 de x.  /  Reduce x en 1.`],
+      ["Mostrar", `Muestra x.  /  Imprime el valor de x.\nPor favor di "hola".  /  Dime sobre score.\n¿Cuánto vale x?`],
+      ["Si", `Si x es mayor que 3, entonces muestra x.\nCuando score es al menos 100, di "¡ganaste!".\nEn caso de que edad sea como máximo 17, muestra "menor".`],
+      ["Repetir", `Repite 5 veces: por favor suma 1 a x.\nHaz lo siguiente 3 veces: muestra "hola".\n4 veces seguidas, aumenta x en 2.`],
     ],
     fr: [
-      ["Affecter", `Soit x égal à 5.`],
-      ["Calcul", `Soit y égal à 3 plus 4 fois 2.`],
-      ["Modifier", `Ajoute 1 à x.  /  Augmente x de 1.`],
-      ["Afficher", `Affiche x.`],
-      ["Si", `Si x est plus grand que 3, affiche x.`],
-      ["Répéter", `Répète 5 fois : ajoute 1 à x.`],
+      ["Affecter", `Soit x égal à 5.  /  Définis score comme 0.\nSupposons que age est 30.  /  Maintenant total devient 100.\nCrée une variable appelée nom avec la valeur "Ana".\nRange 42 dans reponse.  /  Assigne 7 à chance.`],
+      ["Calcul", `Soit y égal à 3 plus 4 fois 2 moins 1.`],
+      ["Modifier", `Ajoute 1 à x.  /  Augmente x de 1.\nDonne à x 5 de plus.  /  Retire 3 de x.  /  Réduis x de 1.`],
+      ["Afficher", `Affiche x.  /  Imprime la valeur de x.\nS'il te plaît dis "salut".  /  Dis-moi la valeur de score.\nQue vaut x ?`],
+      ["Si", `Si x est plus grand que 3, alors affiche x.\nQuand score est au moins 100, dis "gagné !".\nAu cas où age est au plus 17, affiche "mineur".`],
+      ["Répéter", `Répète 5 fois : s'il te plaît ajoute 1 à x.\nFais ceci 3 fois : affiche "salut".\n4 fois de suite, augmente x de 2.`],
     ],
     de: [
-      ["Zuweisen", `Sei x gleich 5.  /  Setze x auf 5.`],
-      ["Rechnen", `Setze y auf 3 plus 4 mal 2.`],
-      ["Ändern", `Addiere 1 zu x.  /  Erhoehe x um 1.`],
-      ["Ausgabe", `Zeige x.`],
-      ["Wenn", `Wenn x groesser als 3 ist, zeige x.`],
-      ["Wiederholen", `Wiederhole 5 mal: erhoehe x um 1.`],
+      ["Zuweisen", `Sei x gleich 5.  /  Definiere score als 0.\nAngenommen alter ist 30.  /  Jetzt wird total gleich 100.\nErstelle eine Variable namens name mit dem Wert "Ana".\nSpeichere 42 in antwort.  /  Weise 7 dem glueck zu.`],
+      ["Rechnen", `Setze y auf 3 plus 4 mal 2 minus 1.`],
+      ["Ändern", `Addiere 1 zu x.  /  Erhoehe x um 1.\nGib dem x 5 dazu.  /  Nimm 3 von x.  /  Verringere x um 1.`],
+      ["Ausgabe", `Zeige x.  /  Drucke den Wert von x.\nBitte sage "hallo".  /  Sag mir den Wert von score.\nWas ist x?`],
+      ["Wenn", `Wenn x groesser als 3 ist, dann zeige x.\nSobald score mindestens 100 ist, sage "gewonnen!".\nFalls alter hoechstens 17 ist, zeige "minderjaehrig".`],
+      ["Wiederholen", `Wiederhole 5 mal: bitte erhoehe x um 1.\nMache Folgendes 3 mal: zeige "hallo".\n4 mal hintereinander, erhoehe x um 2.`],
     ],
     it: [
-      ["Assegnare", `Sia x uguale a 5.`],
-      ["Calcolo", `Sia y uguale a 3 più 4 per 2.`],
-      ["Modificare", `Aggiungi 1 a x.  /  Aumenta x di 1.`],
-      ["Mostrare", `Mostra x.`],
-      ["Se", `Se x è maggiore di 3, mostra x.`],
-      ["Ripetere", `Ripeti 5 volte: aggiungi 1 a x.`],
+      ["Assegnare", `Sia x uguale a 5.  /  Definisci score come 0.\nSupponiamo che eta sia 30.  /  Adesso total diventa 100.\nCrea una variabile chiamata nome con il valore "Ana".\nSalva 42 nel risposta.  /  Assegna 7 a fortuna.`],
+      ["Calcolo", `Sia y uguale a 3 più 4 per 2 meno 1.`],
+      ["Modificare", `Aggiungi 1 a x.  /  Aumenta x di 1.\nDai a x 5 in più.  /  Togli 3 da x.  /  Riduci x di 1.`],
+      ["Mostrare", `Mostra x.  /  Stampa il valore di x.\nPer favore dì "ciao".  /  Dimmi il valore di score.\nQuanto vale x?`],
+      ["Se", `Se x è maggiore di 3, allora mostra x.\nQuando score è almeno 100, dì "vinto!".\nNel caso in cui eta sia al massimo 17, mostra "minorenne".`],
+      ["Ripetere", `Ripeti 5 volte: per favore aggiungi 1 a x.\nFai questo 3 volte: mostra "ciao".\n4 volte di seguito, aumenta x di 2.`],
     ],
   };
+
   return (
     <div className="space-y-3">
       {rows[langId].map(([label, ex]) => (
         <div key={label} className="border-l-2 border-primary/40 pl-3">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-          <div className="mt-0.5 font-mono text-sm text-foreground">{ex}</div>
+          <div className="mt-0.5 whitespace-pre-line font-mono text-sm text-foreground">{ex}</div>
         </div>
       ))}
     </div>
