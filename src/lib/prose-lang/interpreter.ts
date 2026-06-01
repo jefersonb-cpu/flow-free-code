@@ -72,10 +72,10 @@ export function makeCondParser(lang: LanguagePack) {
 }
 
 export function parseProgram(source: string, lang: LanguagePack): Stmt[] {
-  // Split on sentence-ending punctuation. Keep colon-bearing sentences whole.
+  // Split on periods or newlines only (avoids breaking on "!" inside quoted strings).
   const raw = source
     .replace(/\r\n/g, "\n")
-    .split(/(?<=[.!?])\s+|\n+/)
+    .split(/(?<=\.)\s+|\n+/)
     .map((s) => s.trim())
     .filter(Boolean);
 
