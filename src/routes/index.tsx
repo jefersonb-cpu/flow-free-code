@@ -243,7 +243,7 @@ function Cheatsheet({ langId }: { langId: string }) {
       {rows[langId].map(([label, ex]) => (
         <div key={label} className="border-l-2 border-primary/40 pl-3">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-          <div className="mt-0.5 font-mono text-sm text-foreground">{ex}</div>
+          <div className="mt-0.5 whitespace-pre-line font-mono text-sm text-foreground">{ex}</div>
         </div>
       ))}
     </div>
