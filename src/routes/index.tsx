@@ -332,9 +332,17 @@ function Cheatsheet({ langId, query = "" }: { langId: string; query?: string }) 
     ],
   };
 
+  const q = query.trim().toLowerCase();
+  const filtered = rows[langId].filter(
+    ([label, ex]) => !q || label.toLowerCase().includes(q) || ex.toLowerCase().includes(q),
+  );
+
   return (
     <div className="space-y-3">
-      {rows[langId].map(([label, ex]) => (
+      {filtered.length === 0 && (
+        <p className="text-sm text-muted-foreground">No matches for "{query}".</p>
+      )}
+      {filtered.map(([label, ex]) => (
         <div key={label} className="border-l-2 border-primary/40 pl-3">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
           <div className="mt-0.5 whitespace-pre-line font-mono text-sm text-foreground">{ex}</div>
