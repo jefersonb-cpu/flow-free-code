@@ -148,6 +148,11 @@ export function run(source: string, lang: LanguagePack): RunResult {
       if (!vars.has(e.name)) throw new ProseError(`Unknown name "${e.name}".`);
       return vars.get(e.name)!;
     }
+    if (e.kind === "call") {
+      const fn = lang.builtins?.[e.name];
+      if (!fn) throw new ProseError(`Unknown function "${e.name}".`);
+      return fn(e.args.map(evalExpr));
+    }
     const l = evalExpr(e.left);
     const r = evalExpr(e.right);
     if (e.op === "+") {
@@ -159,6 +164,11 @@ export function run(source: string, lang: LanguagePack): RunResult {
     if (e.op === "*") return ln * rn;
     if (e.op === "/") return ln / rn;
     if (e.op === "%") return ln % rn;
+    if (e.op === "**") return Math.pow(ln, rn);
+    if (e.op === "//") {
+      if (rn === 0) throw new ProseError("Division by zero.");
+      return Math.floor(ln / rn);
+    }
     return 0;
   }
 
