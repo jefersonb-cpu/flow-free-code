@@ -164,6 +164,16 @@ function Index() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <VoiceInputButton
+                    langId={lang.id}
+                    onTranscript={(text) => {
+                      setSource((prev) => {
+                        const sep = prev.trimEnd().length === 0 ? "" : prev.endsWith("\n") ? "" : "\n";
+                        const sentence = /[.!?。]$/.test(text.trim()) ? text.trim() : text.trim() + ".";
+                        return prev + sep + sentence;
+                      });
+                    }}
+                  />
                   <button
                     type="button"
                     onClick={onReset}
