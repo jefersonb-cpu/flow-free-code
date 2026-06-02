@@ -134,29 +134,57 @@ function Index() {
               Write programs as coherent sentences. Every command is real grammar — and real code.
             </p>
           </div>
-          <nav className="flex flex-wrap gap-2" aria-label="Choose a human language">
-            {LANGUAGES.map((l) => {
-              const active = l.id === langId;
-              return (
-                <button
-                  key={l.id}
-                  type="button"
-                  onClick={() => onLangChange(l.id)}
-                  aria-pressed={active}
-                  aria-label={`Use ${l.name}`}
-                  className={[
-                    "min-h-11 rounded-md border px-3 py-2 text-sm transition-all",
-                    active
-                      ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
-                      : "border-border bg-card/60 text-foreground hover:border-primary/50",
-                  ].join(" ")}
-                >
-                  <span className="mr-1.5" aria-hidden="true">{l.flag}</span>
-                  {l.name}
-                </button>
-              );
-            })}
-          </nav>
+          <div className="flex flex-col items-start gap-3 sm:items-end">
+            <nav className="flex flex-wrap gap-2" aria-label="Choose a human language">
+              {BASE_LANGUAGES.map((l) => {
+                const active = l.id === baseId;
+                return (
+                  <button
+                    key={l.id}
+                    type="button"
+                    onClick={() => onBaseChange(l.id)}
+                    aria-pressed={active}
+                    aria-label={`Use ${l.name}`}
+                    className={[
+                      "min-h-11 rounded-md border px-3 py-2 text-sm transition-all",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
+                        : "border-border bg-card/60 text-foreground hover:border-primary/50",
+                    ].join(" ")}
+                  >
+                    <span className="mr-1.5" aria-hidden="true">{l.flag}</span>
+                    {l.name}
+                  </button>
+                );
+              })}
+            </nav>
+            <div
+              role="radiogroup"
+              aria-label="Register"
+              className="inline-flex rounded-full border border-border bg-card/60 p-0.5 text-xs"
+            >
+              {(["normal", "slang"] as const).map((r) => {
+                const active = r === register;
+                return (
+                  <button
+                    key={r}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() => onRegisterChange(r)}
+                    className={[
+                      "rounded-full px-3 py-1 capitalize transition",
+                      active
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground",
+                    ].join(" ")}
+                  >
+                    {r}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </header>
 
         <div className="grid gap-6 lg:grid-cols-5">
