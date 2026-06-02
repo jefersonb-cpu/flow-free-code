@@ -1,9 +1,21 @@
 import { useState, type FormEvent } from "react";
+import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+
+const footerNav = [
+  { label: "About", to: "/about" as const },
+  { label: "Case studies", to: "/case-studies" as const },
+  { label: "Testimonials", to: "/testimonials" as const },
+  { label: "FAQ", to: "/faq" as const },
+  { label: "Contact", to: "/contact" as const },
+  { label: "Security", to: "/security" as const },
+  { label: "Privacy", to: "/privacy" as const },
+  { label: "Terms", to: "/terms" as const },
+];
 
 export function SiteFooter() {
   const { user } = useAuth();
@@ -48,7 +60,18 @@ export function SiteFooter() {
             </Button>
           </div>
         </form>
-        <div className="flex flex-col items-center justify-between gap-2 border-t border-border/40 pt-4 text-xs text-muted-foreground sm:flex-row">
+        <nav className="flex flex-wrap gap-x-5 gap-y-2 border-t border-border/40 pt-4" aria-label="Footer">
+          {footerNav.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex flex-col items-center justify-between gap-2 text-xs text-muted-foreground sm:flex-row">
           <p>© {new Date().getFullYear()} Prosa — natural-language programming.</p>
           <p>Eight human languages · one runtime · <span className="text-foreground">no AI, just grammar.</span></p>
         </div>
