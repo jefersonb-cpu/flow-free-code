@@ -28,17 +28,25 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [langId, setLangId] = useState("en");
-  const lang = useMemo(() => getLanguage(langId), [langId]);
+  const [baseId, setBaseId] = useState("en");
+  const [register, setRegister] = useState<"normal" | "slang">("normal");
+  const lang = useMemo(() => getVariant(baseId, register), [baseId, register]);
   const [source, setSource] = useState(lang.sample);
   const [result, setResult] = useState<RunResult | null>(null);
   const [showCheatsheet, setShowCheatsheet] = useState(false);
   const [query, setQuery] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const onLangChange = (id: string) => {
-    const next = getLanguage(id);
-    setLangId(id);
+  const onBaseChange = (id: string) => {
+    const next = getVariant(id, register);
+    setBaseId(id);
+    setSource(next.sample);
+    setResult(null);
+  };
+
+  const onRegisterChange = (r: "normal" | "slang") => {
+    const next = getVariant(baseId, r);
+    setRegister(r);
     setSource(next.sample);
     setResult(null);
   };
