@@ -175,6 +175,17 @@ function Index() {
                   </button>
                   <button
                     type="button"
+                    onClick={onSave}
+                    disabled={saving}
+                    aria-label={isAuthenticated ? "Save snippet to your account" : "Sign in to save"}
+                    title={isAuthenticated ? "Save" : "Sign in to save"}
+                    className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition hover:text-foreground disabled:opacity-50"
+                  >
+                    <Save className="h-3.5 w-3.5" aria-hidden="true" />
+                    {saving ? "Saving…" : "Save"}
+                  </button>
+                  <button
+                    type="button"
                     onClick={onRun}
                     aria-label="Run program (Ctrl or Cmd + Enter)"
                     title="Run (⌘/Ctrl + Enter)"
