@@ -44,6 +44,109 @@ export type Database = {
         }
         Relationships: []
       }
+      run_history: {
+        Row: {
+          created_at: string
+          id: string
+          language: string
+          output: string | null
+          source: string
+          success: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          language: string
+          output?: string | null
+          source: string
+          success?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          language?: string
+          output?: string | null
+          source?: string
+          success?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      snippet_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          snippet_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          snippet_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          snippet_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "snippet_favorites_snippet_id_fkey"
+            columns: ["snippet_id"]
+            isOneToOne: false
+            referencedRelation: "snippets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      snippets: {
+        Row: {
+          created_at: string
+          forked_from: string | null
+          id: string
+          language: string
+          owner_id: string
+          source: string
+          title: string
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          forked_from?: string | null
+          id?: string
+          language?: string
+          owner_id: string
+          source?: string
+          title: string
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          forked_from?: string | null
+          id?: string
+          language?: string
+          owner_id?: string
+          source?: string
+          title?: string
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "snippets_forked_from_fkey"
+            columns: ["forked_from"]
+            isOneToOne: false
+            referencedRelation: "snippets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
