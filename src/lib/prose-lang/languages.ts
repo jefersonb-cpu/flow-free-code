@@ -668,13 +668,13 @@ function makeSlang(
     flag?: string;
     sample: string;
     extraPatterns?: LangPattern[];
-    extraOps?: Partial<Record<"+" | "-" | "*" | "/", string[]>>;
+    extraOps?: Partial<Record<"+" | "-" | "*" | "/" | "%", string[]>>;
     extraComparators?: LanguagePack["comparators"];
   },
 ): LanguagePack {
   const ops = { ...base.operators } as LanguagePack["operators"];
-  (Object.keys(overrides.extraOps ?? {}) as Array<keyof typeof ops>).forEach((k) => {
-    ops[k] = [...(overrides.extraOps?.[k] ?? []), ...ops[k]];
+  (Object.keys(overrides.extraOps ?? {}) as Array<"+" | "-" | "*" | "/" | "%">).forEach((k) => {
+    ops[k] = [...(overrides.extraOps?.[k] ?? []), ...(ops[k] ?? [])];
   });
   return {
     id: `${base.id}-slang`,
