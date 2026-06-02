@@ -53,6 +53,7 @@ export function SiteHeader() {
               </Link>
             </>
           )}
+          <NotificationBell />
           <ThemeToggle />
           {loading ? null : isAuthenticated ? (
             <>
