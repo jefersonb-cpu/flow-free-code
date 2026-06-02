@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Play, Sparkles, BookOpen, RotateCcw, Search, Save } from "lucide-react";
-import { LANGUAGES, getLanguage } from "@/lib/prose-lang/languages";
+import { BASE_LANGUAGES, getVariant } from "@/lib/prose-lang/languages";
 import { run, type RunResult } from "@/lib/prose-lang/interpreter";
 import { useAuth } from "@/lib/auth-context";
 import { createSnippet, recordRun } from "@/lib/snippets";
@@ -28,17 +28,25 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const [langId, setLangId] = useState("en");
-  const lang = useMemo(() => getLanguage(langId), [langId]);
+  const [baseId, setBaseId] = useState("en");
+  const [register, setRegister] = useState<"normal" | "slang">("normal");
+  const lang = useMemo(() => getVariant(baseId, register), [baseId, register]);
   const [source, setSource] = useState(lang.sample);
   const [result, setResult] = useState<RunResult | null>(null);
   const [showCheatsheet, setShowCheatsheet] = useState(false);
   const [query, setQuery] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const onLangChange = (id: string) => {
-    const next = getLanguage(id);
-    setLangId(id);
+  const onBaseChange = (id: string) => {
+    const next = getVariant(id, register);
+    setBaseId(id);
+    setSource(next.sample);
+    setResult(null);
+  };
+
+  const onRegisterChange = (r: "normal" | "slang") => {
+    const next = getVariant(baseId, r);
+    setRegister(r);
     setSource(next.sample);
     setResult(null);
   };
@@ -126,29 +134,57 @@ function Index() {
               Write programs as coherent sentences. Every command is real grammar — and real code.
             </p>
           </div>
-          <nav className="flex flex-wrap gap-2" aria-label="Choose a human language">
-            {LANGUAGES.map((l) => {
-              const active = l.id === langId;
-              return (
-                <button
-                  key={l.id}
-                  type="button"
-                  onClick={() => onLangChange(l.id)}
-                  aria-pressed={active}
-                  aria-label={`Use ${l.name}`}
-                  className={[
-                    "min-h-11 rounded-md border px-3 py-2 text-sm transition-all",
-                    active
-                      ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
-                      : "border-border bg-card/60 text-foreground hover:border-primary/50",
-                  ].join(" ")}
-                >
-                  <span className="mr-1.5" aria-hidden="true">{l.flag}</span>
-                  {l.name}
-                </button>
-              );
-            })}
-          </nav>
+          <div className="flex flex-col items-start gap-3 sm:items-end">
+            <nav className="flex flex-wrap gap-2" aria-label="Choose a human language">
+              {BASE_LANGUAGES.map((l) => {
+                const active = l.id === baseId;
+                return (
+                  <button
+                    key={l.id}
+                    type="button"
+                    onClick={() => onBaseChange(l.id)}
+                    aria-pressed={active}
+                    aria-label={`Use ${l.name}`}
+                    className={[
+                      "min-h-11 rounded-md border px-3 py-2 text-sm transition-all",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
+                        : "border-border bg-card/60 text-foreground hover:border-primary/50",
+                    ].join(" ")}
+                  >
+                    <span className="mr-1.5" aria-hidden="true">{l.flag}</span>
+                    {l.name}
+                  </button>
+                );
+              })}
+            </nav>
+            <div
+              role="radiogroup"
+              aria-label="Register"
+              className="inline-flex rounded-full border border-border bg-card/60 p-0.5 text-xs"
+            >
+              {(["normal", "slang"] as const).map((r) => {
+                const active = r === register;
+                return (
+                  <button
+                    key={r}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() => onRegisterChange(r)}
+                    className={[
+                      "rounded-full px-3 py-1 capitalize transition",
+                      active
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground",
+                    ].join(" ")}
+                  >
+                    {r}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </header>
 
         <div className="grid gap-6 lg:grid-cols-5">
@@ -165,7 +201,7 @@ function Index() {
                 </div>
                 <div className="flex items-center gap-2">
                   <VoiceInputButton
-                    langId={lang.id}
+                    langId={lang.baseId ?? lang.id}
                     onTranscript={(text) => {
                       setSource((prev) => {
                         const sep = prev.trimEnd().length === 0 ? "" : prev.endsWith("\n") ? "" : "\n";
@@ -301,7 +337,7 @@ function Index() {
                       className="h-10 w-full rounded-md border border-border bg-background pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
-                  <Cheatsheet langId={lang.id} query={query} />
+                  <Cheatsheet langId={lang.baseId ?? lang.id} query={query} />
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">

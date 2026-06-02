@@ -30,11 +30,17 @@ export type LangPattern = {
   ) => Stmt;
 };
 
+export type LanguageRegister = "normal" | "slang";
+
 export type LanguagePack = {
   id: string;
   name: string;
   flag: string;
   sample: string;
+  /** Which base language this pack belongs to (e.g. "en"). Same for normal + slang variants. */
+  baseId?: string;
+  /** Register: formal/normal grammar or casual/slang grammar. */
+  register?: LanguageRegister;
   /** Operators in expressions: { "+": ["plus"], "-": ["minus"], ... } */
   operators: Record<"+" | "-" | "*" | "/", string[]>;
   /** Comparators for conditions, longer phrases first. */

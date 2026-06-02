@@ -654,16 +654,260 @@ const chinese: LanguagePack = {
   ],
 };
 
+// Tag each base pack as the "normal" register.
+[english, spanish, french, german, italian, portuguese, japanese, chinese].forEach((p) => {
+  p.baseId = p.id;
+  p.register = "normal";
+});
+
+// ---------- Slang factory ----------
+function makeSlang(
+  base: LanguagePack,
+  overrides: {
+    name: string;
+    flag?: string;
+    sample: string;
+    extraPatterns?: LangPattern[];
+    extraOps?: Partial<Record<"+" | "-" | "*" | "/", string[]>>;
+    extraComparators?: LanguagePack["comparators"];
+  },
+): LanguagePack {
+  const ops = { ...base.operators } as LanguagePack["operators"];
+  (Object.keys(overrides.extraOps ?? {}) as Array<keyof typeof ops>).forEach((k) => {
+    ops[k] = [...(overrides.extraOps?.[k] ?? []), ...ops[k]];
+  });
+  return {
+    id: `${base.id}-slang`,
+    baseId: base.id,
+    register: "slang",
+    name: overrides.name,
+    flag: overrides.flag ?? base.flag,
+    sample: overrides.sample,
+    operators: ops,
+    // longer/casual phrases first, then originals
+    comparators: [...(overrides.extraComparators ?? []), ...base.comparators],
+    truthy: base.truthy,
+    falsy: base.falsy,
+    // Slang patterns are tried first so they win matches; fall through to all base patterns.
+    patterns: [...(overrides.extraPatterns ?? []), ...base.patterns],
+  };
+}
+
+// ---------- English (slang) ----------
+const englishSlang = makeSlang(english, {
+  name: "English (slang)",
+  sample: `Yo, count is 0.
+Bump count by 1, do it 5x.
+Drop count.
+If count's bigger than 3, holla "big one!".
+Gimme count + 10 more.
+Spit "final: " + count.`,
+  extraOps: { "+": ["n"], "*": ["x"] },
+  extraComparators: [
+    { phrase: "'s bigger than", op: ">" },
+    { phrase: "'s smaller than", op: "<" },
+    { phrase: "'s the same as", op: "==" },
+    { phrase: "'s", op: "==" },
+  ],
+  extraPatterns: [
+    patAssign(/^(?:Yo,?\s+|Listen,?\s+)?(?:gimme|lemme\s+get|lemme\s+have)\s+([A-Za-z_]\w*)\s*(?:=|to)\s*(.+)$/i),
+    patAssign(/^Yo,?\s+([A-Za-z_]\w*)\s+(?:is|=)\s+(.+)$/i),
+    patAddTo(/^(?:Bump|Crank|Pump)\s+(?:up\s+)?([A-Za-z_]\w*)\s+by\s+(.+)$/i, false),
+    patAddTo(/^(?:Slap|Throw|Toss)\s+(.+?)\s+on(?:to)?\s+([A-Za-z_]\w*)$/i, true),
+    patSubFrom(/^(?:Knock|Chop)\s+(.+?)\s+off(?:\s+of)?\s+([A-Za-z_]\w*)$/i, true),
+    patPrint(/^(?:Spit|Drop|Holla|Yell|Shout|Blurt|Flex)\s+(?:out\s+)?(.+)$/i),
+    patPrint(/^Lemme\s+see\s+(.+)$/i),
+    patRepeat(/^(?:Do\s+(?:it|this)|Run\s+it)\s+(.+?)\s*x:?\s+(.+)$/i),
+    patRepeatSwapped(/^(.+?)\s*,?\s*(.+?)\s*x$/i),
+  ],
+});
+
+// ---------- Spanish (slang) ----------
+const spanishSlang = makeSlang(spanish, {
+  name: "Español (slang)",
+  sample: `Oye, ponle 0 a cuenta.
+Échale 1 a cuenta, 5 veces.
+Tira cuenta.
+Si cuenta está pasada de 3, suelta "¡brutal!".
+Súbele 10 a cuenta.
+Manda "final: " más cuenta.`,
+  extraComparators: [
+    { phrase: "está pasada de", op: ">" },
+    { phrase: "está pasado de", op: ">" },
+    { phrase: "está corta de", op: "<" },
+    { phrase: "está corto de", op: "<" },
+  ],
+  extraPatterns: [
+    patAssignSwapped(/^(?:Oye,?\s+)?(?:Ponle|Pónle|Échale|Echale|Métele|Metele)\s+(.+?)\s+a\s+(?:el\s+|la\s+)?([A-Za-zÀ-ÿ_]\w*)$/i),
+    patAssign(/^Oye,?\s+([A-Za-zÀ-ÿ_]\w*)\s+(?:vale|es|=)\s+(.+)$/i),
+    patAddTo(/^(?:Súbele|Subele|Pégale|Pegale|Métele|Metele)\s+(.+?)\s+a\s+(?:el\s+|la\s+)?([A-Za-zÀ-ÿ_]\w*)$/i, true),
+    patAddTo(/^(?:Echa|Echale|Échale)\s+(.+?)\s+(?:más|mas)\s+a\s+(?:el\s+|la\s+)?([A-Za-zÀ-ÿ_]\w*)$/i, true),
+    patSubFrom(/^(?:Bájale|Bajale|Quítale|Quitale)\s+(.+?)\s+a\s+(?:el\s+|la\s+)?([A-Za-zÀ-ÿ_]\w*)$/i, true),
+    patPrint(/^(?:Tira|Manda|Suelta|Avienta|Chécame|Chequea|Saca|Cuéntame|Cuentame)\s+(?:el\s+valor\s+de\s+)?(.+)$/i),
+  ],
+});
+
+// ---------- French (slang) ----------
+const frenchSlang = makeSlang(french, {
+  name: "Français (slang)",
+  sample: `Bon, compteur c'est 0.
+Balance 1 dans compteur, fais ça 5 fois.
+Crache compteur.
+Si compteur c'est plus que 3, balance "ouf !".
+File 10 de plus à compteur.
+Envoie "final : " plus compteur.`,
+  extraComparators: [
+    { phrase: "c'est plus que", op: ">" },
+    { phrase: "c'est moins que", op: "<" },
+    { phrase: "c'est pareil que", op: "==" },
+    { phrase: "c'est", op: "==" },
+  ],
+  extraPatterns: [
+    patAssign(/^(?:Bon,?\s+|Allez,?\s+)?([A-Za-zÀ-ÿ_]\w*)\s+c'est\s+(.+)$/i),
+    patAssignSwapped(/^(?:Balance|Fous|Colle|Mets)\s+(.+?)\s+dans\s+(?:le\s+|la\s+|l')?([A-Za-zÀ-ÿ_]\w*)$/i),
+    patAddTo(/^(?:File|Refile|Ajoute|Colle)\s+(.+?)\s+(?:de\s+plus\s+)?(?:à|au|a\s+la|à\s+l')\s+([A-Za-zÀ-ÿ_]\w*)$/i, true),
+    patSubFrom(/^(?:Vire|Dégage|Degage|Arrache)\s+(.+?)\s+(?:de|du|à|a)\s+([A-Za-zÀ-ÿ_]\w*)$/i, true),
+    patPrint(/^(?:Balance|Crache|Envoie|Sors|Lâche|Lache|Gueule|Montre[- ]moi)\s+(?:moi\s+)?(.+)$/i),
+  ],
+});
+
+// ---------- German (slang) ----------
+const germanSlang = makeSlang(german, {
+  name: "Deutsch (slang)",
+  sample: `Alter, zaehler ist 0.
+Pack 1 auf zaehler, mach das 5 mal.
+Schmeiss zaehler raus.
+Wenn zaehler dicker als 3 ist, knall "krass!" raus.
+Hau zaehler 10 drauf.
+Zeig her "ende: " plus zaehler.`,
+  extraComparators: [
+    { phrase: "dicker als", op: ">" },
+    { phrase: "duenner als", op: "<" },
+    { phrase: "dünner als", op: "<" },
+  ],
+  extraPatterns: [
+    patAssign(/^(?:Alter,?\s+|Ey,?\s+)?([A-Za-zÄÖÜäöüß_]\w*)\s+(?:ist|=)\s+(.+)$/i),
+    patAssignSwapped(/^(?:Pack|Knall|Stopf|Hau)\s+(.+?)\s+(?:in|auf|zu)\s+(?:der\s+|die\s+|das\s+|den\s+)?([A-Za-zÄÖÜäöüß_]\w*)$/i),
+    patAddTo(/^(?:Hau|Klatsch|Pack)\s+(?:der\s+|die\s+|das\s+|den\s+|dem\s+)?([A-Za-zÄÖÜäöüß_]\w*)\s+(.+?)\s+drauf$/i, false),
+    patSubFrom(/^(?:Reiss|Reiß|Zieh|Klau)\s+(.+?)\s+(?:von|aus)\s+(?:der\s+|die\s+|das\s+|den\s+|dem\s+)?([A-Za-zÄÖÜäöüß_]\w*)\s*(?:weg|ab|raus)?$/i, true),
+    patPrint(/^(?:Schmeiss|Schmeiß|Knall|Hau|Spuck)\s+(.+?)\s+(?:raus|aus)$/i),
+    patPrint(/^Zeig\s+(?:mir\s+)?her\s+(.+)$/i),
+  ],
+});
+
+// ---------- Italian (slang) ----------
+const italianSlang = makeSlang(italian, {
+  name: "Italiano (slang)",
+  sample: `Dai, conta è 0.
+Butta 1 dentro conta, fallo 5 volte.
+Spara conta.
+Se conta è bello grosso di 3, urla "forte!".
+Pompa conta di 10.
+Manda fuori "fine: " più conta.`,
+  extraComparators: [
+    { phrase: "è bello grosso di", op: ">" },
+    { phrase: "è bello piccolo di", op: "<" },
+  ],
+  extraPatterns: [
+    patAssign(/^(?:Dai,?\s+|Oh,?\s+|Senti,?\s+)?([A-Za-zÀ-ÿ_]\w*)\s+(?:è|e')\s+(.+)$/i),
+    patAssignSwapped(/^(?:Butta|Sbatti|Caccia|Ficca)\s+(.+?)\s+(?:in|dentro|nel|nella)\s+([A-Za-zÀ-ÿ_]\w*)$/i),
+    patAddTo(/^(?:Pompa|Tira\s+su|Gonfia)\s+(?:il\s+|la\s+|lo\s+|l')?([A-Za-zÀ-ÿ_]\w*)\s+di\s+(.+)$/i, false),
+    patSubFrom(/^(?:Strappa|Stacca|Leva)\s+(.+?)\s+(?:da|a)\s+(?:il\s+|la\s+|lo\s+|l')?([A-Za-zÀ-ÿ_]\w*)$/i, true),
+    patPrint(/^(?:Spara|Urla|Grida|Manda\s+fuori|Sputa|Sgancia)\s+(?:fuori\s+)?(.+)$/i),
+  ],
+});
+
+// ---------- Portuguese (slang) ----------
+const portugueseSlang = makeSlang(portuguese, {
+  name: "Português (slang)",
+  sample: `Tipo, contador é 0.
+Bota 1 no contador, faz isso 5 vezes.
+Solta contador.
+Se contador tá maior que 3, manda "irado!".
+Joga 10 no contador.
+Solta "fim: " mais contador.`,
+  extraComparators: [
+    { phrase: "tá maior que", op: ">" },
+    { phrase: "ta maior que", op: ">" },
+    { phrase: "tá menor que", op: "<" },
+    { phrase: "ta menor que", op: "<" },
+    { phrase: "tá", op: "==" },
+  ],
+  extraPatterns: [
+    patAssign(/^(?:Tipo,?\s+|Ó,?\s+|Olha,?\s+)?([A-Za-zÀ-ÿ_]\w*)\s+(?:é|tá|ta|=)\s+(.+)$/i),
+    patAssignSwapped(/^(?:Bota|Joga|Enfia|Mete)\s+(.+?)\s+(?:em|no|na)\s+([A-Za-zÀ-ÿ_]\w*)$/i),
+    patAddTo(/^(?:Joga|Bota|Manda|Acrescenta)\s+(.+?)\s+(?:no|na|pro|pra)\s+([A-Za-zÀ-ÿ_]\w*)$/i, true),
+    patSubFrom(/^(?:Tira|Arranca|Rouba)\s+(.+?)\s+(?:do|da|de)\s+([A-Za-zÀ-ÿ_]\w*)$/i, true),
+    patPrint(/^(?:Solta|Manda|Joga|Cospe|Mostra\s+aí|Mostra\s+ai)\s+(?:aí\s+|ai\s+)?(.+)$/i),
+  ],
+});
+
+// ---------- Japanese (casual) ----------
+const japaneseSlang = makeSlang(japanese, {
+  name: "日本語 (タメ口)",
+  sample: `counter は 0 だ。
+5 回 やる: counter に 1 たす。
+counter 見せて。
+もし counter が 3 より大きい なら、 "やばっ！" って言って。
+counter に 10 たす。
+"最後は " たす counter 見せて。`,
+  extraPatterns: [
+    patAssign(new RegExp("^(" + JID + ")\\s+(?:は|が)\\s+(.+?)\\s+(?:だ|だよ|だね|じゃん)$", "i")),
+    patAddTo(new RegExp("^(" + JID + ")\\s+に\\s+(.+?)\\s+たす$", "i"), false),
+    patSubFrom(new RegExp("^(" + JID + ")\\s+から\\s+(.+?)\\s+ひく$", "i"), false),
+    patPrint(/^(.+?)\s+(?:見せて|出して|言って|教えて)$/i),
+    patPrint(/^(.+?)\s+って\s+(?:言って|出して)$/i),
+    patRepeat(/^(.+?)\s+回\s+やる[：:]\s*(.+)$/i),
+    patIf(/^もし\s+(.+?)\s+なら[、,]?\s*(.+)$/i),
+  ],
+});
+
+// ---------- Chinese (slang) ----------
+const chineseSlang = makeSlang(chinese, {
+  name: "中文 (口语)",
+  sample: `搞 counter 等于 0。
+来 5 次: 给 counter 加 1。
+甩出 counter。
+要是 counter 比 3 大, 喊 "牛逼!"。
+给 counter 加 10。
+甩出 "结果: " 加 counter。`,
+  extraComparators: [
+    { phrase: "比", op: ">" },
+    { phrase: "没到", op: "<" },
+  ],
+  extraPatterns: [
+    patAssign(/^(?:搞|整|弄)\s+([A-Za-z_]\w*)\s+(?:等于|是|为|=)\s+(.+)$/i),
+    patAssignSwapped(/^(?:塞|扔|甩)\s+(.+?)\s+(?:进|到)\s+([A-Za-z_]\w*)(?:\s+里)?$/i),
+    patAddTo(/^给\s+([A-Za-z_]\w*)\s+加\s+(.+)$/i, false),
+    patAddTo(/^(?:堆|怼|拍)\s+(.+?)\s+(?:到|进|上)\s+([A-Za-z_]\w*)(?:\s+上)?$/i, true),
+    patSubFrom(/^(?:扒|抽|拔)\s+(.+?)\s+(?:从|出)\s+([A-Za-z_]\w*)$/i, true),
+    patPrint(/^(?:甩出|亮出|晒|喊|秀|抛出)\s+(.+)$/i),
+    patRepeat(/^来\s+(.+?)\s+次[:：]?\s*(.+)$/i),
+    patIf(/^(?:要是|假设|万一)\s+(.+?)[,，]\s*(?:就|那么)?\s*(.+)$/i),
+  ],
+});
+
 export const LANGUAGES: LanguagePack[] = [
-  english,
-  spanish,
-  french,
-  german,
-  italian,
-  portuguese,
-  japanese,
-  chinese,
+  english, englishSlang,
+  spanish, spanishSlang,
+  french, frenchSlang,
+  german, germanSlang,
+  italian, italianSlang,
+  portuguese, portugueseSlang,
+  japanese, japaneseSlang,
+  chinese, chineseSlang,
 ];
+
+/** Base language entries (unique by baseId), used for the language picker. */
+export const BASE_LANGUAGES = [english, spanish, french, german, italian, portuguese, japanese, chinese];
+
 export function getLanguage(id: string): LanguagePack {
   return LANGUAGES.find((l) => l.id === id) ?? english;
 }
+
+/** Look up the variant for a given base language + register. */
+export function getVariant(baseId: string, register: "normal" | "slang"): LanguagePack {
+  const found = LANGUAGES.find((l) => l.baseId === baseId && l.register === register);
+  return found ?? getLanguage(baseId);
+}
+
