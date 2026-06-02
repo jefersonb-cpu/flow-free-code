@@ -201,7 +201,7 @@ function Index() {
                 </div>
                 <div className="flex items-center gap-2">
                   <VoiceInputButton
-                    langId={lang.id}
+                    langId={lang.baseId ?? lang.id}
                     onTranscript={(text) => {
                       setSource((prev) => {
                         const sep = prev.trimEnd().length === 0 ? "" : prev.endsWith("\n") ? "" : "\n";
