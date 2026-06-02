@@ -58,4 +58,6 @@ export type LanguagePack = {
   falsy: string[];
   /** Sentence-level patterns. */
   patterns: LangPattern[];
+  /** Built-in function names callable in expressions, mapped to their implementations. */
+  builtins?: Record<string, (args: Value[]) => Value>;
 };
