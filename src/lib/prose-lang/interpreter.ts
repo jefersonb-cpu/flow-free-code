@@ -38,9 +38,9 @@ function parseLiteral(token: string, lang: LanguagePack): Expr | null {
 
 export function makeExprParser(lang: LanguagePack) {
   // Build a single regex of all operator phrases, longest first.
-  const opEntries: Array<[string, "+" | "-" | "*" | "/"]> = [];
-  (Object.keys(lang.operators) as Array<"+" | "-" | "*" | "/">).forEach((op) => {
-    for (const phrase of lang.operators[op]) opEntries.push([phrase, op]);
+  const opEntries: Array<[string, "+" | "-" | "*" | "/" | "%"]> = [];
+  (Object.keys(lang.operators) as Array<"+" | "-" | "*" | "/" | "%">).forEach((op) => {
+    for (const phrase of lang.operators[op] ?? []) opEntries.push([phrase, op]);
   });
   opEntries.sort((a, b) => b[0].length - a[0].length);
   const opRegex = new RegExp(
@@ -158,6 +158,7 @@ export function run(source: string, lang: LanguagePack): RunResult {
     if (e.op === "-") return ln - rn;
     if (e.op === "*") return ln * rn;
     if (e.op === "/") return ln / rn;
+    if (e.op === "%") return ln % rn;
     return 0;
   }
 
@@ -176,6 +177,8 @@ export function run(source: string, lang: LanguagePack): RunResult {
   function exec(s: Stmt, depth = 0): void {
     if (depth > 200) throw new ProseError("Too much nesting.");
     switch (s.kind) {
+      case "noop":
+        return;
       case "assign":
         vars.set(s.name, evalExpr(s.expr));
         return;
@@ -189,11 +192,27 @@ export function run(source: string, lang: LanguagePack): RunResult {
         vars.set(s.name, cur - Number(evalExpr(s.expr)));
         return;
       }
+      case "mulby": {
+        const cur = vars.has(s.name) ? Number(vars.get(s.name)) : 0;
+        vars.set(s.name, cur * Number(evalExpr(s.expr)));
+        return;
+      }
+      case "divby": {
+        const cur = vars.has(s.name) ? Number(vars.get(s.name)) : 0;
+        const d = Number(evalExpr(s.expr));
+        if (d === 0) throw new ProseError("Division by zero.");
+        vars.set(s.name, cur / d);
+        return;
+      }
       case "print":
         output.push(String(evalExpr(s.expr)));
         return;
       case "if":
         if (evalCond(s.cond)) exec(s.then, depth + 1);
+        return;
+      case "ifelse":
+        if (evalCond(s.cond)) exec(s.then, depth + 1);
+        else exec(s.else, depth + 1);
         return;
       case "repeat": {
         const n = Math.max(0, Math.floor(Number(evalExpr(s.times))));
@@ -201,8 +220,17 @@ export function run(source: string, lang: LanguagePack): RunResult {
         for (let i = 0; i < n; i++) exec(s.body, depth + 1);
         return;
       }
+      case "while": {
+        let guard = 0;
+        while (evalCond(s.cond)) {
+          if (++guard > 10000) throw new ProseError("While loop ran too long (max 10000 iterations).");
+          exec(s.body, depth + 1);
+        }
+        return;
+      }
     }
   }
+
 
   try {
     const program = parseProgram(source, lang);

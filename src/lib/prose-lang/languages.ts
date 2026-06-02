@@ -78,6 +78,48 @@ function patRepeatSwapped(re: RegExp): LangPattern {
     }),
   };
 }
+function patMulBy(re: RegExp, exprFirst = false): LangPattern {
+  return {
+    regex: re,
+    build: (g, _i, parseExpr): Stmt => {
+      const [expr, name] = exprFirst ? [g[0], g[1]] : [g[1], g[0]];
+      return { kind: "mulby", name, expr: parseExpr(expr) };
+    },
+  };
+}
+function patDivBy(re: RegExp, exprFirst = false): LangPattern {
+  return {
+    regex: re,
+    build: (g, _i, parseExpr): Stmt => {
+      const [expr, name] = exprFirst ? [g[0], g[1]] : [g[1], g[0]];
+      return { kind: "divby", name, expr: parseExpr(expr) };
+    },
+  };
+}
+function patWhile(re: RegExp): LangPattern {
+  return {
+    regex: re,
+    build: ([cond, inner], parseInner, _e, parseCond): Stmt => ({
+      kind: "while",
+      cond: parseCond(cond),
+      body: parseInner(inner),
+    }),
+  };
+}
+function patIfElse(re: RegExp): LangPattern {
+  return {
+    regex: re,
+    build: ([cond, thn, els], parseInner, _e, parseCond): Stmt => ({
+      kind: "ifelse",
+      cond: parseCond(cond),
+      then: parseInner(thn),
+      else: parseInner(els),
+    }),
+  };
+}
+function patComment(re: RegExp): LangPattern {
+  return { regex: re, build: (): Stmt => ({ kind: "noop" }) };
+}
 
 // ---------- English ----------
 const english: LanguagePack = {
@@ -660,6 +702,132 @@ const chinese: LanguagePack = {
   p.register = "normal";
 });
 
+// ---------- Extra grammar shared across all base languages ----------
+// Each base pack gains: modulo operator, multiply-by, divide-by, while-loop,
+// if/else, and comment patterns — translated into the base language.
+type Extras = {
+  modulo: string[];
+  patterns: LangPattern[];
+};
+const ID_EN = "[A-Za-z_]\\w*";
+const ID_LATIN = "[A-Za-zÀ-ÿ_]\\w*";
+const ID_DE = "[A-Za-zÄÖÜäöüß_]\\w*";
+
+const EXTRAS: Record<string, Extras> = {
+  en: {
+    modulo: ["modulo", "mod", "remainder of"],
+    patterns: [
+      patIfElse(/^If\s+(.+?),\s*(?:then\s+)?(.+?),?\s+(?:otherwise|else|or\s+else)\s+(.+)$/i),
+      patWhile(/^While\s+(.+?),\s*(?:keep\s+|do\s+)?(.+)$/i),
+      patWhile(/^As\s+long\s+as\s+(.+?),\s*(.+)$/i),
+      patWhile(/^Keep\s+(?:doing\s+|going\s+)?(.+?)\s+while\s+(.+)$/i),
+      patMulBy(/^(?:Please\s+)?(?:Multiply|Scale)\s+(?:the\s+)?([A-Za-z_]\w*)\s+by\s+(.+)$/i, false),
+      patMulBy(/^(?:Please\s+)?Double\s+(?:the\s+)?([A-Za-z_]\w*)$/i, false),
+      patDivBy(/^(?:Please\s+)?Divide\s+(?:the\s+)?([A-Za-z_]\w*)\s+by\s+(.+)$/i, false),
+      patDivBy(/^(?:Please\s+)?Halve\s+(?:the\s+)?([A-Za-z_]\w*)$/i, false),
+      patComment(/^(?:Note|Remark|Comment)\s*[:,]\s*.+$/i),
+      patComment(/^#\s+.+$/),
+    ],
+  },
+  es: {
+    modulo: ["módulo", "modulo", "resto de"],
+    patterns: [
+      patIfElse(/^Si\s+(.+?),\s*(?:entonces\s+)?(.+?),?\s+(?:si\s+no|de\s+lo\s+contrario|sino)\s+(.+)$/i),
+      patWhile(/^Mientras\s+(.+?),\s*(.+)$/i),
+      patWhile(/^Mientras\s+que\s+(.+?),\s*(.+)$/i),
+      patMulBy(new RegExp("^(?:Por\\s+favor\\s+)?Multiplica\\s+(?:el\\s+|la\\s+)?(" + ID_LATIN + ")\\s+por\\s+(.+)$", "i")),
+      patMulBy(new RegExp("^(?:Por\\s+favor\\s+)?Duplica\\s+(?:el\\s+|la\\s+)?(" + ID_LATIN + ")$", "i")),
+      patDivBy(new RegExp("^(?:Por\\s+favor\\s+)?Divide\\s+(?:el\\s+|la\\s+)?(" + ID_LATIN + ")\\s+(?:por|entre)\\s+(.+)$", "i")),
+      patComment(/^(?:Nota|Comentario)\s*[:,]\s*.+$/i),
+      patComment(/^#\s+.+$/),
+    ],
+  },
+  fr: {
+    modulo: ["modulo", "reste de"],
+    patterns: [
+      patIfElse(/^Si\s+(.+?),\s*(?:alors\s+)?(.+?),?\s+(?:sinon|autrement)\s+(.+)$/i),
+      patWhile(/^Tant\s+que\s+(.+?),\s*(.+)$/i),
+      patWhile(/^Pendant\s+que\s+(.+?),\s*(.+)$/i),
+      patMulBy(new RegExp("^(?:S'il\\s+te\\s+pla[îi]t\\s+)?Multiplie\\s+(?:le\\s+|la\\s+|l')?(" + ID_LATIN + ")\\s+par\\s+(.+)$", "i")),
+      patMulBy(new RegExp("^(?:S'il\\s+te\\s+pla[îi]t\\s+)?Double\\s+(?:le\\s+|la\\s+|l')?(" + ID_LATIN + ")$", "i")),
+      patDivBy(new RegExp("^(?:S'il\\s+te\\s+pla[îi]t\\s+)?Divise\\s+(?:le\\s+|la\\s+|l')?(" + ID_LATIN + ")\\s+par\\s+(.+)$", "i")),
+      patComment(/^(?:Note|Remarque|Commentaire)\s*[:,]\s*.+$/i),
+      patComment(/^#\s+.+$/),
+    ],
+  },
+  de: {
+    modulo: ["modulo", "rest von"],
+    patterns: [
+      patIfElse(/^Wenn\s+(.+?),\s*(?:dann\s+)?(.+?),?\s+(?:sonst|ansonsten|andernfalls)\s+(.+)$/i),
+      patWhile(/^Solange\s+(.+?),\s*(.+)$/i),
+      patWhile(/^Während\s+(.+?),\s*(.+)$/i),
+      patMulBy(new RegExp("^(?:Bitte\\s+)?Multipliziere\\s+(?:der\\s+|die\\s+|das\\s+|den\\s+)?(" + ID_DE + ")\\s+mit\\s+(.+)$", "i")),
+      patMulBy(new RegExp("^(?:Bitte\\s+)?Verdopple\\s+(?:der\\s+|die\\s+|das\\s+|den\\s+)?(" + ID_DE + ")$", "i")),
+      patDivBy(new RegExp("^(?:Bitte\\s+)?Teile\\s+(?:der\\s+|die\\s+|das\\s+|den\\s+)?(" + ID_DE + ")\\s+durch\\s+(.+)$", "i")),
+      patComment(/^(?:Notiz|Anmerkung|Kommentar)\s*[:,]\s*.+$/i),
+      patComment(/^#\s+.+$/),
+    ],
+  },
+  it: {
+    modulo: ["modulo", "resto di"],
+    patterns: [
+      patIfElse(/^Se\s+(.+?),\s*(?:allora\s+)?(.+?),?\s+(?:altrimenti|sennò|senno)\s+(.+)$/i),
+      patWhile(/^Finché\s+(.+?),\s*(.+)$/i),
+      patWhile(/^Finche\s+(.+?),\s*(.+)$/i),
+      patWhile(/^Mentre\s+(.+?),\s*(.+)$/i),
+      patMulBy(new RegExp("^(?:Per\\s+favore\\s+)?Moltiplica\\s+(?:il\\s+|la\\s+|lo\\s+|l')?(" + ID_LATIN + ")\\s+per\\s+(.+)$", "i")),
+      patMulBy(new RegExp("^(?:Per\\s+favore\\s+)?Raddoppia\\s+(?:il\\s+|la\\s+|lo\\s+|l')?(" + ID_LATIN + ")$", "i")),
+      patDivBy(new RegExp("^(?:Per\\s+favore\\s+)?Dividi\\s+(?:il\\s+|la\\s+|lo\\s+|l')?(" + ID_LATIN + ")\\s+per\\s+(.+)$", "i")),
+      patComment(/^(?:Nota|Commento)\s*[:,]\s*.+$/i),
+      patComment(/^#\s+.+$/),
+    ],
+  },
+  pt: {
+    modulo: ["módulo", "modulo", "resto de"],
+    patterns: [
+      patIfElse(/^Se\s+(.+?),\s*(?:então\s+|entao\s+)?(.+?),?\s+(?:senão|senao|caso\s+contrário|caso\s+contrario)\s+(.+)$/i),
+      patWhile(/^Enquanto\s+(.+?),\s*(.+)$/i),
+      patMulBy(new RegExp("^(?:Por\\s+favor\\s+)?Multiplique\\s+(?:o\\s+|a\\s+)?(" + ID_LATIN + ")\\s+por\\s+(.+)$", "i")),
+      patMulBy(new RegExp("^(?:Por\\s+favor\\s+)?Dobre\\s+(?:o\\s+|a\\s+)?(" + ID_LATIN + ")$", "i")),
+      patDivBy(new RegExp("^(?:Por\\s+favor\\s+)?Divida\\s+(?:o\\s+|a\\s+)?(" + ID_LATIN + ")\\s+por\\s+(.+)$", "i")),
+      patComment(/^(?:Nota|Comentário|Comentario)\s*[:,]\s*.+$/i),
+      patComment(/^#\s+.+$/),
+    ],
+  },
+  ja: {
+    modulo: ["余り", "あまり"],
+    patterns: [
+      patWhile(new RegExp("^(.+?)\\s+の間[、,]?\\s*(.+)$", "i")),
+      patWhile(new RegExp("^(.+?)\\s+(?:のうちは|である限り)[、,]?\\s*(.+)$", "i")),
+      patMulBy(new RegExp("^(" + JID + ")\\s+を\\s+(.+?)\\s+(?:倍にする|掛ける)$", "i"), false),
+      patDivBy(new RegExp("^(" + JID + ")\\s+を\\s+(.+?)\\s+で\\s+割る$", "i"), false),
+      patComment(/^(?:メモ|注)\s*[:：,、]\s*.+$/i),
+      patComment(/^#\s+.+$/),
+    ],
+  },
+  zh: {
+    modulo: ["模", "对…取余", "余"],
+    patterns: [
+      patIfElse(/^如果\s+(.+?)[,，]\s*(?:那么|则)?\s*(.+?)[,，]\s*(?:否则|不然)\s*(.+)$/i),
+      patWhile(/^当\s+(.+?)\s+(?:时)[,，]?\s*(?:就|一直)?\s*(.+)$/i),
+      patWhile(/^只要\s+(.+?)[,，]?\s*(?:就)?\s*(.+)$/i),
+      patMulBy(/^(?:请\s*)?把\s+([A-Za-z_]\w*)\s+乘以\s+(.+)$/i, false),
+      patDivBy(/^(?:请\s*)?把\s+([A-Za-z_]\w*)\s+除以\s+(.+)$/i, false),
+      patComment(/^(?:注释|备注|注)\s*[:：,，]\s*.+$/i),
+      patComment(/^#\s+.+$/),
+    ],
+  },
+};
+
+for (const pack of [english, spanish, french, german, italian, portuguese, japanese, chinese]) {
+  const x = EXTRAS[pack.id];
+  if (!x) continue;
+  (pack.operators as Record<string, string[]>)["%"] = x.modulo;
+  // Prepend new patterns so they're tried before older, broader regexes.
+  pack.patterns = [...x.patterns, ...pack.patterns];
+}
+
+
 // ---------- Slang factory ----------
 function makeSlang(
   base: LanguagePack,
@@ -668,13 +836,13 @@ function makeSlang(
     flag?: string;
     sample: string;
     extraPatterns?: LangPattern[];
-    extraOps?: Partial<Record<"+" | "-" | "*" | "/", string[]>>;
+    extraOps?: Partial<Record<"+" | "-" | "*" | "/" | "%", string[]>>;
     extraComparators?: LanguagePack["comparators"];
   },
 ): LanguagePack {
   const ops = { ...base.operators } as LanguagePack["operators"];
-  (Object.keys(overrides.extraOps ?? {}) as Array<keyof typeof ops>).forEach((k) => {
-    ops[k] = [...(overrides.extraOps?.[k] ?? []), ...ops[k]];
+  (Object.keys(overrides.extraOps ?? {}) as Array<"+" | "-" | "*" | "/" | "%">).forEach((k) => {
+    ops[k] = [...(overrides.extraOps?.[k] ?? []), ...(ops[k] ?? [])];
   });
   return {
     id: `${base.id}-slang`,
