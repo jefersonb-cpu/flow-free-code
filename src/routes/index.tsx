@@ -1,8 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Play, Sparkles, BookOpen, RotateCcw, Search } from "lucide-react";
+import { Play, Sparkles, BookOpen, RotateCcw, Search, Save } from "lucide-react";
 import { LANGUAGES, getLanguage } from "@/lib/prose-lang/languages";
 import { run, type RunResult } from "@/lib/prose-lang/interpreter";
+import { useAuth } from "@/lib/auth-context";
+import { createSnippet, recordRun } from "@/lib/snippets";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,10 +42,53 @@ function Index() {
     setResult(null);
   };
 
-  const onRun = () => setResult(run(source, lang));
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [saving, setSaving] = useState(false);
+
+  const executeAndPersist = (code: string) => {
+    const r = run(code, lang);
+    setResult(r);
+    if (user) {
+      const outputText = r.output.join("\n") + (r.error ? `\n⚠ ${r.error.message}` : "");
+      recordRun({
+        user_id: user.id,
+        language: lang.id,
+        source: code,
+        output: outputText,
+        success: !r.error,
+      }).catch(() => {});
+    }
+  };
+
+  const onRun = () => executeAndPersist(source);
   const onReset = () => {
     setSource(lang.sample);
     setResult(null);
+  };
+
+  const onSave = async () => {
+    if (!isAuthenticated || !user) {
+      navigate({ to: "/login", search: { redirect: "/" } });
+      return;
+    }
+    setSaving(true);
+    try {
+      const title = source.split("\n")[0]?.slice(0, 60).trim() || "Untitled snippet";
+      const snippet = await createSnippet({
+        owner_id: user.id,
+        title,
+        language: lang.id,
+        source,
+        visibility: "private",
+      });
+      toast.success("Snippet saved.");
+      navigate({ to: "/snippets/$id", params: { id: snippet.id } });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Cmd/Ctrl+Enter runs the program from inside the editor.
@@ -52,12 +98,13 @@ function Index() {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
         e.preventDefault();
-        setResult(run(el.value, lang));
+        executeAndPersist(el.value);
       }
     };
     el.addEventListener("keydown", onKey);
     return () => el.removeEventListener("keydown", onKey);
-  }, [lang]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang, user]);
 
   return (
     <section className="px-4 py-10 sm:px-8 sm:py-16" aria-labelledby="prosa-heading">
