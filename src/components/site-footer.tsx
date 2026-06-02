@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 const footerNav = [
   { label: "About", to: "/about" as const },
+  { label: "Pricing", to: "/pricing" as const },
   { label: "Case studies", to: "/case-studies" as const },
   { label: "Testimonials", to: "/testimonials" as const },
   { label: "FAQ", to: "/faq" as const },
