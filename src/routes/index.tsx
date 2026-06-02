@@ -264,7 +264,7 @@ function Index() {
   );
 }
 
-function Cheatsheet({ langId }: { langId: string }) {
+function Cheatsheet({ langId, query = "" }: { langId: string; query?: string }) {
   const rows: Record<string, Array<[string, string]>> = {
     en: [
       ["Assign", `Let x be 5.  /  Set x to "hi".  /  Define score as 0.\nSuppose age is 30.  /  Now total becomes 100.\nCreate a variable called name with the value "Ana".\nStore 42 in answer.  /  Assign 7 to lucky.`],
