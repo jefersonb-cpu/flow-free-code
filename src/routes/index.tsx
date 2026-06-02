@@ -65,33 +65,42 @@ function Index() {
         <header className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              <span>Five human languages · one runtime</span>
+              <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+              <span>Eight human languages · one runtime</span>
             </div>
-            <h1 className="font-serif text-5xl leading-none tracking-tight text-foreground sm:text-6xl">
+            <h1
+              id="prosa-heading"
+              className="font-serif text-5xl leading-none tracking-tight text-foreground sm:text-6xl"
+            >
               Prosa<span className="text-primary">.</span>
             </h1>
             <p className="mt-3 max-w-xl text-base text-muted-foreground">
               Write programs as coherent sentences. Every command is real grammar — and real code.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {LANGUAGES.map((l) => (
-              <button
-                key={l.id}
-                onClick={() => onLangChange(l.id)}
-                className={[
-                  "rounded-md border px-3 py-2 text-sm transition-all",
-                  l.id === langId
-                    ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
-                    : "border-border bg-card/60 text-foreground hover:border-primary/50",
-                ].join(" ")}
-              >
-                <span className="mr-1.5">{l.flag}</span>
-                {l.name}
-              </button>
-            ))}
-          </div>
+          <nav className="flex flex-wrap gap-2" aria-label="Choose a human language">
+            {LANGUAGES.map((l) => {
+              const active = l.id === langId;
+              return (
+                <button
+                  key={l.id}
+                  type="button"
+                  onClick={() => onLangChange(l.id)}
+                  aria-pressed={active}
+                  aria-label={`Use ${l.name}`}
+                  className={[
+                    "min-h-11 rounded-md border px-3 py-2 text-sm transition-all",
+                    active
+                      ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
+                      : "border-border bg-card/60 text-foreground hover:border-primary/50",
+                  ].join(" ")}
+                >
+                  <span className="mr-1.5" aria-hidden="true">{l.flag}</span>
+                  {l.name}
+                </button>
+              );
+            })}
+          </nav>
         </header>
 
         <div className="grid gap-6 lg:grid-cols-5">
