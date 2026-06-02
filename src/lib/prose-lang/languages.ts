@@ -1218,10 +1218,13 @@ export const LANGUAGES: LanguagePack[] = [
   portuguese, portugueseSlang,
   japanese, japaneseSlang,
   chinese, chineseSlang,
+  typescript,
+  python,
 ];
 
 /** Base language entries (unique by baseId), used for the language picker. */
-export const BASE_LANGUAGES = [english, spanish, french, german, italian, portuguese, japanese, chinese];
+export const BASE_LANGUAGES = [english, spanish, french, german, italian, portuguese, japanese, chinese, typescript, python];
+
 
 export function getLanguage(id: string): LanguagePack {
   return LANGUAGES.find((l) => l.id === id) ?? english;
