@@ -457,10 +457,22 @@ function Cheatsheet({ langId, query = "" }: { langId: string; query?: string }) 
     ],
   };
 
+  // Built-in functions and extra operators are available in every language.
+  // Call style: `name(args)` or `receiver.method(args)`; `x.length` is sugar for `length(x)`.
+  const sharedExtras: Array<[string, string]> = [
+    ["Power & floor div", `2 ** 8       (exponent)\n17 // 5      (floor division)`],
+    ["Math functions", `Math.abs(-7)   /   Math.floor(3.9)   /   Math.ceil(0.1)\nMath.max(1, 9) /   Math.min(2, 5)   /   Math.sqrt(16)\nMath.round(2.6) /  Math.pow(2, 8)   /   Math.random()`],
+    ["Type casting", `Number("42")   /   String(7)        /   Boolean(0)\nparseInt("12") /   parseFloat("3.14") / isNaN(x)\nint("42")      /   float("3.14")    /   str(7)   /   bool(1)`],
+    ["String methods", `"hello".toUpperCase()   /   name.toLowerCase()\n"  hi  ".trim()         /   name.length\nupper(name)             /   lower(name)   /   len(name)`],
+    ["Aggregates", `sum(10, 20, 30)    (variadic sum)`],
+  ];
+
   const q = query.trim().toLowerCase();
-  const filtered = (rows[langId] ?? []).filter(
+  const all = [...(rows[langId] ?? []), ...sharedExtras];
+  const filtered = all.filter(
     ([label, ex]) => !q || label.toLowerCase().includes(q) || ex.toLowerCase().includes(q),
   );
+
 
 
   return (
