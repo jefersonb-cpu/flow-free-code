@@ -160,20 +160,29 @@ function Index() {
               <div className="border-b border-border bg-card/40 px-4 py-2 font-mono text-xs text-muted-foreground">
                 output
               </div>
-              <div className="min-h-[120px] p-5 font-mono text-sm">
+              <div
+                className="min-h-[120px] p-5 font-mono text-sm"
+                role="status"
+                aria-live="polite"
+                aria-atomic="false"
+              >
                 {!result && (
                   <span className="text-muted-foreground">
-                    Press <span className="text-primary">Run</span> to execute your sentences.
+                    Press <span className="text-primary">Run</span> to execute your sentences
+                    {" "}<kbd className="rounded border border-border bg-card px-1.5 py-0.5 text-[10px] text-foreground">⌘/Ctrl + Enter</kbd>.
                   </span>
                 )}
                 {result?.output.map((line, i) => (
                   <div key={i} className="text-foreground">
-                    <span className="mr-2 text-muted-foreground">›</span>
+                    <span className="mr-2 text-muted-foreground" aria-hidden="true">›</span>
                     {line}
                   </div>
                 ))}
                 {result?.error && (
-                  <div className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-destructive-foreground">
+                  <div
+                    role="alert"
+                    className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-destructive-foreground"
+                  >
                     <div className="text-destructive">⚠ {result.error.message}</div>
                     {result.error.sentence && (
                       <div className="mt-1 text-xs text-muted-foreground">
@@ -189,11 +198,14 @@ function Index() {
           <aside className="lg:col-span-2">
             <div className="rounded-xl border border-border bg-card p-6">
               <button
+                type="button"
                 onClick={() => setShowCheatsheet((v) => !v)}
+                aria-expanded={showCheatsheet}
+                aria-controls="cheatsheet-panel"
                 className="mb-4 flex w-full items-center justify-between text-left"
               >
                 <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-primary" />
+                  <BookOpen className="h-4 w-4 text-primary" aria-hidden="true" />
                   <h2 className="font-serif text-2xl">Grammar of {lang.name}</h2>
                 </div>
                 <span className="text-xs text-muted-foreground">
@@ -202,7 +214,26 @@ function Index() {
               </button>
 
               {showCheatsheet ? (
-                <Cheatsheet langId={lang.id} />
+                <div id="cheatsheet-panel">
+                  <div className="relative mb-3">
+                    <Search
+                      className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                    <label htmlFor="cheatsheet-search" className="sr-only">
+                      Search grammar
+                    </label>
+                    <input
+                      id="cheatsheet-search"
+                      type="search"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Search the grammar…"
+                      className="h-10 w-full rounded-md border border-border bg-background pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                  <Cheatsheet langId={lang.id} query={query} />
+                </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
                   Each sentence ends with a period. Commands chain top to bottom. Inline
