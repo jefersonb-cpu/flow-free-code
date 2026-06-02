@@ -38,6 +38,13 @@ export function SiteHeader() {
           {isAuthenticated && (
             <>
               <Link
+                to="/dashboard"
+                className="hidden text-sm text-muted-foreground hover:text-foreground sm:inline"
+                activeProps={{ className: "hidden text-sm text-foreground sm:inline" }}
+              >
+                Dashboard
+              </Link>
+              <Link
                 to="/my-snippets"
                 className="hidden text-sm text-muted-foreground hover:text-foreground sm:inline"
                 activeProps={{ className: "hidden text-sm text-foreground sm:inline" }}

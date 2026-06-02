@@ -5,6 +5,7 @@ import { LANGUAGES, getLanguage } from "@/lib/prose-lang/languages";
 import { run, type RunResult } from "@/lib/prose-lang/interpreter";
 import { useAuth } from "@/lib/auth-context";
 import { createSnippet, recordRun } from "@/lib/snippets";
+import { VoiceInputButton } from "@/components/voice-input-button";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
@@ -163,6 +164,16 @@ function Index() {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
+                  <VoiceInputButton
+                    langId={lang.id}
+                    onTranscript={(text) => {
+                      setSource((prev) => {
+                        const sep = prev.trimEnd().length === 0 ? "" : prev.endsWith("\n") ? "" : "\n";
+                        const sentence = /[.!?。]$/.test(text.trim()) ? text.trim() : text.trim() + ".";
+                        return prev + sep + sentence;
+                      });
+                    }}
+                  />
                   <button
                     type="button"
                     onClick={onReset}
