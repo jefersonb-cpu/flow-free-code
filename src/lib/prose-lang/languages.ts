@@ -1,4 +1,4 @@
-import type { LanguagePack, LangPattern, Stmt } from "./types";
+import type { LanguagePack, LangPattern, Stmt, Value } from "./types";
 
 // ---------- Shared pattern factories ----------
 function patAssign(re: RegExp): LangPattern {
@@ -837,6 +837,7 @@ const codeOperators: LanguagePack["operators"] = {
   "*": ["*"],
   "/": ["/"],
   "%": ["%"],
+  "**": ["**"],
 };
 const codeComparators: LanguagePack["comparators"] = [
   { phrase: "===", op: "==" },
@@ -848,6 +849,57 @@ const codeComparators: LanguagePack["comparators"] = [
   { phrase: ">", op: ">" },
   { phrase: "<", op: "<" },
 ];
+
+// ---- Built-in libraries ----
+const num = (v: Value) => Number(v);
+const sharedMath = {
+  abs: (a: Value[]) => Math.abs(num(a[0])),
+  min: (a: Value[]) => Math.min(...a.map(num)),
+  max: (a: Value[]) => Math.max(...a.map(num)),
+  pow: (a: Value[]) => Math.pow(num(a[0]), num(a[1])),
+  round: (a: Value[]) => Math.round(num(a[0])),
+};
+// TypeScript-only built-ins: Math.*, String/Number coercion, length, JSON, etc.
+const tsBuiltins: Record<string, (a: Value[]) => Value> = {
+  "Math.abs": sharedMath.abs,
+  "Math.min": sharedMath.min,
+  "Math.max": sharedMath.max,
+  "Math.pow": sharedMath.pow,
+  "Math.round": sharedMath.round,
+  "Math.floor": (a) => Math.floor(num(a[0])),
+  "Math.ceil": (a) => Math.ceil(num(a[0])),
+  "Math.sqrt": (a) => Math.sqrt(num(a[0])),
+  "Math.sign": (a) => Math.sign(num(a[0])),
+  "Math.trunc": (a) => Math.trunc(num(a[0])),
+  "Math.random": () => Math.random(),
+  "Math.PI": () => Math.PI,
+  Number: (a) => Number(a[0]),
+  String: (a) => String(a[0]),
+  Boolean: (a) => Boolean(a[0]),
+  parseInt: (a) => parseInt(String(a[0]), a[1] != null ? num(a[1]) : 10),
+  parseFloat: (a) => parseFloat(String(a[0])),
+  isNaN: (a) => Number.isNaN(num(a[0])),
+  length: (a) => String(a[0]).length, // x.length
+  toUpperCase: (a) => String(a[0]).toUpperCase(), // x.toUpperCase()
+  toLowerCase: (a) => String(a[0]).toLowerCase(),
+  trim: (a) => String(a[0]).trim(),
+};
+// Python-only built-ins
+const pyBuiltins: Record<string, (a: Value[]) => Value> = {
+  abs: sharedMath.abs,
+  min: sharedMath.min,
+  max: sharedMath.max,
+  pow: sharedMath.pow,
+  round: sharedMath.round,
+  int: (a) => Math.trunc(num(a[0])),
+  float: (a) => Number(a[0]),
+  str: (a) => String(a[0]),
+  bool: (a) => Boolean(a[0]),
+  len: (a) => String(a[0]).length,
+  sum: (a) => a.reduce<number>((s, v) => s + num(v), 0),
+  upper: (a) => String(a[0]).toUpperCase(),
+  lower: (a) => String(a[0]).toLowerCase(),
+};
 
 // Custom for-loop pattern: `for (let i = 0; i < N; i++) body;`
 function patForLoopC(re: RegExp): LangPattern {
@@ -870,12 +922,20 @@ for (let i = 0; i < 5; i++) counter += 1;
 console.log(counter);
 if (counter > 3) console.log("big number!");
 counter *= 2;
+let power = counter ** 2;
+console.log("squared: " + power);
+let abs = Math.abs(-7);
+console.log("abs: " + abs);
+let label = "hello";
+console.log("len: " + label.length);
+console.log(label.toUpperCase());
 while (counter < 50) counter += 10;
 console.log("final: " + counter);`,
   operators: codeOperators,
   comparators: codeComparators,
   truthy: ["true"],
   falsy: ["false"],
+  builtins: tsBuiltins,
   patterns: [
     // Comments
     patComment(new RegExp("^\\s*//.*$")),
@@ -936,12 +996,21 @@ for i in range(5): counter += 1
 print(counter)
 if counter > 3: print("big number!")
 counter *= 2
+power = counter ** 2
+print("squared: " + str(power))
+half = 17 // 5
+print("floor div: " + str(half))
+print("abs: " + str(abs(-7)))
+name = "hello"
+print("len: " + str(len(name)))
+print(upper(name))
 while counter < 50: counter += 10
-print("final: " + counter)`,
-  operators: codeOperators,
+print("final: " + str(counter))`,
+  operators: { ...codeOperators, "//": ["//"] },
   comparators: codeComparators,
   truthy: ["true", "True"],
   falsy: ["false", "False"],
+  builtins: pyBuiltins,
   patterns: [
     // Comments
     patComment(/^\s*#.*$/),

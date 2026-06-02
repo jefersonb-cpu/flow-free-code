@@ -1,11 +1,12 @@
 export type Value = number | string | boolean;
 
-export type BinOp = "+" | "-" | "*" | "/" | "%";
+export type BinOp = "+" | "-" | "*" | "/" | "%" | "**" | "//";
 
 export type Expr =
   | { kind: "lit"; value: Value }
   | { kind: "var"; name: string }
-  | { kind: "bin"; op: BinOp; left: Expr; right: Expr };
+  | { kind: "bin"; op: BinOp; left: Expr; right: Expr }
+  | { kind: "call"; name: string; args: Expr[] };
 
 export type Cond = {
   op: ">" | "<" | "==" | ">=" | "<=" | "!=";
@@ -57,4 +58,6 @@ export type LanguagePack = {
   falsy: string[];
   /** Sentence-level patterns. */
   patterns: LangPattern[];
+  /** Built-in function names callable in expressions, mapped to their implementations. */
+  builtins?: Record<string, (args: Value[]) => Value>;
 };
