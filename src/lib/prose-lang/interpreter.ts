@@ -88,13 +88,19 @@ export function makeExprParser(lang: LanguagePack) {
     if (raw.startsWith("(") && raw.endsWith(")")) {
       return parse(raw.slice(1, -1));
     }
-    // Built-in function call:  name(args)  or  Name.method(args)
+    // Built-in function call:  name(args)  or  Name.method(args)  (dotted name registered as builtin)
     const callMatch = raw.match(/^([A-Za-z_][\w.]*)\s*\((.*)\)\s*$/s);
     if (callMatch && lang.builtins && lang.builtins[callMatch[1]]) {
-      const args = splitTopLevelCommas(callMatch[2]).map(parse);
+      const args = callMatch[2].trim() === "" ? [] : splitTopLevelCommas(callMatch[2]).map(parse);
       return { kind: "call", name: callMatch[1], args };
     }
-    // Property-style call:  expr.length  →  length(expr)
+    // Method-style call:  receiver.method(args)  →  method(receiver, ...args)
+    const methodMatch = raw.match(/^(.+)\.([A-Za-z_]\w*)\s*\((.*)\)\s*$/s);
+    if (methodMatch && lang.builtins && lang.builtins[methodMatch[2]]) {
+      const extra = methodMatch[3].trim() === "" ? [] : splitTopLevelCommas(methodMatch[3]).map(parse);
+      return { kind: "call", name: methodMatch[2], args: [parse(methodMatch[1]), ...extra] };
+    }
+    // Property-style access:  expr.length  →  length(expr)
     const propMatch = raw.match(/^(.+)\.([A-Za-z_]\w*)$/);
     if (propMatch && lang.builtins && lang.builtins[propMatch[2]]) {
       return { kind: "call", name: propMatch[2], args: [parse(propMatch[1])] };
