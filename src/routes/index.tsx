@@ -337,7 +337,7 @@ function Index() {
                       className="h-10 w-full rounded-md border border-border bg-background pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
-                  <Cheatsheet langId={lang.id} query={query} />
+                  <Cheatsheet langId={lang.baseId ?? lang.id} query={query} />
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
