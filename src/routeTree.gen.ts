@@ -15,7 +15,11 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SnippetsIndexRouteImport } from './routes/snippets.index'
+import { Route as SnippetsIdRouteImport } from './routes/snippets.$id'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedMySnippetsRouteImport } from './routes/_authenticated/my-snippets'
+import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -46,9 +50,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SnippetsIndexRoute = SnippetsIndexRouteImport.update({
+  id: '/snippets/',
+  path: '/snippets/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SnippetsIdRoute = SnippetsIdRouteImport.update({
+  id: '/snippets/$id',
+  path: '/snippets/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMySnippetsRoute = AuthenticatedMySnippetsRouteImport.update({
+  id: '/my-snippets',
+  path: '/my-snippets',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
@@ -58,7 +82,11 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/my-snippets': typeof AuthenticatedMySnippetsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/snippets/$id': typeof SnippetsIdRoute
+  '/snippets/': typeof SnippetsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -66,7 +94,11 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/my-snippets': typeof AuthenticatedMySnippetsRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/snippets/$id': typeof SnippetsIdRoute
+  '/snippets': typeof SnippetsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,7 +108,11 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/my-snippets': typeof AuthenticatedMySnippetsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/snippets/$id': typeof SnippetsIdRoute
+  '/snippets/': typeof SnippetsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -86,7 +122,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/history'
+    | '/my-snippets'
     | '/profile'
+    | '/snippets/$id'
+    | '/snippets/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -94,7 +134,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/history'
+    | '/my-snippets'
     | '/profile'
+    | '/snippets/$id'
+    | '/snippets'
   id:
     | '__root__'
     | '/'
@@ -103,7 +147,11 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/_authenticated/history'
+    | '/_authenticated/my-snippets'
     | '/_authenticated/profile'
+    | '/snippets/$id'
+    | '/snippets/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -113,6 +161,8 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  SnippetsIdRoute: typeof SnippetsIdRoute
+  SnippetsIndexRoute: typeof SnippetsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -159,6 +209,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/snippets/': {
+      id: '/snippets/'
+      path: '/snippets'
+      fullPath: '/snippets/'
+      preLoaderRoute: typeof SnippetsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/snippets/$id': {
+      id: '/snippets/$id'
+      path: '/snippets/$id'
+      fullPath: '/snippets/$id'
+      preLoaderRoute: typeof SnippetsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -166,14 +230,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/my-snippets': {
+      id: '/_authenticated/my-snippets'
+      path: '/my-snippets'
+      fullPath: '/my-snippets'
+      preLoaderRoute: typeof AuthenticatedMySnippetsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/history': {
+      id: '/_authenticated/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedMySnippetsRoute: typeof AuthenticatedMySnippetsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedMySnippetsRoute: AuthenticatedMySnippetsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
 }
 
@@ -188,7 +270,19 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  SnippetsIdRoute: SnippetsIdRoute,
+  SnippetsIndexRoute: SnippetsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
