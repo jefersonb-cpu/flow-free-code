@@ -4,6 +4,7 @@ import { listMySnippets, listFavoriteIds } from "@/lib/snippets";
 import { getLanguage } from "@/lib/prose-lang/languages";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
+import { SortableSnippetList } from "@/components/sortable-snippet-list";
 
 export const Route = createFileRoute("/_authenticated/my-snippets")({
   head: () => ({
