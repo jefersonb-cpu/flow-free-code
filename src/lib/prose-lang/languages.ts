@@ -1097,8 +1097,10 @@ function makeSlang(
     falsy: base.falsy,
     // Slang patterns are tried first so they win matches; fall through to all base patterns.
     patterns: [...(overrides.extraPatterns ?? []), ...base.patterns],
+    builtins: base.builtins,
   };
 }
+
 
 // ---------- English (slang) ----------
 const englishSlang = makeSlang(english, {
