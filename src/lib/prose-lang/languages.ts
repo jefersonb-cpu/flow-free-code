@@ -1049,6 +1049,20 @@ print("final: " + str(counter))`,
   p.register = "normal";
 });
 
+// ---------- Integrate built-ins + extra operators into every prose language ----------
+// Every natural-language pack gets the union of TypeScript + Python built-ins
+// (callable as `name(args)` or `receiver.method(args)`) and the `**` / `//` operators.
+const sharedBuiltins: Record<string, (a: Value[]) => Value> = {
+  ...tsBuiltins,
+  ...pyBuiltins,
+};
+for (const pack of proseBases) {
+  pack.builtins = { ...(pack.builtins ?? {}), ...sharedBuiltins };
+  (pack.operators as Record<string, string[]>)["**"] = ["**"];
+  (pack.operators as Record<string, string[]>)["//"] = ["//"];
+}
+
+
 
 
 
