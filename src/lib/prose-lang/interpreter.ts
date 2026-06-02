@@ -8,6 +8,18 @@ export class ProseError extends Error {
 
 const isIdent = (s: string) => /^[A-Za-zÀ-ÿ_][A-Za-zÀ-ÿ0-9_]*$/.test(s);
 
+// Leading articles across supported languages — stripped before resolving an identifier.
+const ARTICLE_RE = /^(?:the|a|an|el|la|los|las|un|una|le|les|l'|un|une|der|die|das|den|dem|des|ein|eine|einen|einem|einer|il|lo|gli|i|uno)\s+/i;
+
+function stripArticles(s: string): string {
+  let t = s.trim();
+  while (true) {
+    const next = t.replace(ARTICLE_RE, "").trim();
+    if (next === t) return t;
+    t = next;
+  }
+}
+
 function parseLiteral(token: string, lang: LanguagePack): Expr | null {
   const t = token.trim();
   if (/^-?\d+(\.\d+)?$/.test(t)) return { kind: "lit", value: parseFloat(t) };
