@@ -29,6 +29,8 @@ function Index() {
   const [source, setSource] = useState(lang.sample);
   const [result, setResult] = useState<RunResult | null>(null);
   const [showCheatsheet, setShowCheatsheet] = useState(false);
+  const [query, setQuery] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const onLangChange = (id: string) => {
     const next = getLanguage(id);
@@ -43,8 +45,22 @@ function Index() {
     setResult(null);
   };
 
+  // Cmd/Ctrl+Enter runs the program from inside the editor.
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        setResult(run(el.value, lang));
+      }
+    };
+    el.addEventListener("keydown", onKey);
+    return () => el.removeEventListener("keydown", onKey);
+  }, [lang]);
+
   return (
-    <main className="min-h-screen px-4 py-10 sm:px-8 sm:py-16">
+    <section className="px-4 py-10 sm:px-8 sm:py-16" aria-labelledby="prosa-heading">
       <div className="mx-auto max-w-6xl">
         <header className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
