@@ -17,6 +17,9 @@ import { run } from "@/lib/prose-lang/interpreter";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CommentsSection } from "@/components/comments-section";
+import { RatingWidget } from "@/components/rating-widget";
+import { ShareButtons } from "@/components/share-buttons";
 
 export const Route = createFileRoute("/snippets/$id")({
   head: () => ({
