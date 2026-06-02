@@ -1,4 +1,4 @@
-import type { LanguagePack, LangPattern, Stmt } from "./types";
+import type { LanguagePack, LangPattern, Stmt, Value } from "./types";
 
 // ---------- Shared pattern factories ----------
 function patAssign(re: RegExp): LangPattern {
