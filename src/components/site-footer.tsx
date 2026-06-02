@@ -1,9 +1,21 @@
 import { useState, type FormEvent } from "react";
+import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+
+const footerNav = [
+  { label: "About", to: "/about" as const },
+  { label: "Case studies", to: "/case-studies" as const },
+  { label: "Testimonials", to: "/testimonials" as const },
+  { label: "FAQ", to: "/faq" as const },
+  { label: "Contact", to: "/contact" as const },
+  { label: "Security", to: "/security" as const },
+  { label: "Privacy", to: "/privacy" as const },
+  { label: "Terms", to: "/terms" as const },
+];
 
 export function SiteFooter() {
   const { user } = useAuth();
