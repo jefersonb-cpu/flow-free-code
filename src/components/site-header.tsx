@@ -27,6 +27,31 @@ export function SiteHeader() {
           </span>
         </Link>
         <nav className="flex items-center gap-2" aria-label="Site">
+          <Link
+            to="/snippets"
+            className="hidden text-sm text-muted-foreground hover:text-foreground sm:inline"
+            activeProps={{ className: "hidden text-sm text-foreground sm:inline" }}
+          >
+            Browse
+          </Link>
+          {isAuthenticated && (
+            <>
+              <Link
+                to="/my-snippets"
+                className="hidden text-sm text-muted-foreground hover:text-foreground sm:inline"
+                activeProps={{ className: "hidden text-sm text-foreground sm:inline" }}
+              >
+                My snippets
+              </Link>
+              <Link
+                to="/history"
+                className="hidden text-sm text-muted-foreground hover:text-foreground sm:inline"
+                activeProps={{ className: "hidden text-sm text-foreground sm:inline" }}
+              >
+                History
+              </Link>
+            </>
+          )}
           <ThemeToggle />
           {loading ? null : isAuthenticated ? (
             <>
