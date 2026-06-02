@@ -819,13 +819,15 @@ const EXTRAS: Record<string, Extras> = {
   },
 };
 
-for (const pack of [english, spanish, french, german, italian, portuguese, japanese, chinese]) {
+const proseBases = [english, spanish, french, german, italian, portuguese, japanese, chinese];
+for (const pack of proseBases) {
   const x = EXTRAS[pack.id];
   if (!x) continue;
   (pack.operators as Record<string, string[]>)["%"] = x.modulo;
   // Prepend new patterns so they're tried before older, broader regexes.
   pack.patterns = [...x.patterns, ...pack.patterns];
 }
+
 
 // ---------- TypeScript ----------
 // Real code syntax. Statements are one-per-line; trailing `;` optional.
@@ -1047,6 +1049,20 @@ print("final: " + str(counter))`,
   p.register = "normal";
 });
 
+// ---------- Integrate built-ins + extra operators into every prose language ----------
+// Every natural-language pack gets the union of TypeScript + Python built-ins
+// (callable as `name(args)` or `receiver.method(args)`) and the `**` / `//` operators.
+const sharedBuiltins: Record<string, (a: Value[]) => Value> = {
+  ...tsBuiltins,
+  ...pyBuiltins,
+};
+for (const pack of proseBases) {
+  pack.builtins = { ...(pack.builtins ?? {}), ...sharedBuiltins };
+  (pack.operators as Record<string, string[]>)["**"] = ["**"];
+  (pack.operators as Record<string, string[]>)["//"] = ["//"];
+}
+
+
 
 
 
@@ -1081,8 +1097,10 @@ function makeSlang(
     falsy: base.falsy,
     // Slang patterns are tried first so they win matches; fall through to all base patterns.
     patterns: [...(overrides.extraPatterns ?? []), ...base.patterns],
+    builtins: base.builtins,
   };
 }
+
 
 // ---------- English (slang) ----------
 const englishSlang = makeSlang(english, {
@@ -1287,12 +1305,11 @@ export const LANGUAGES: LanguagePack[] = [
   portuguese, portugueseSlang,
   japanese, japaneseSlang,
   chinese, chineseSlang,
-  typescript,
-  python,
 ];
 
 /** Base language entries (unique by baseId), used for the language picker. */
-export const BASE_LANGUAGES = [english, spanish, french, german, italian, portuguese, japanese, chinese, typescript, python];
+export const BASE_LANGUAGES = [english, spanish, french, german, italian, portuguese, japanese, chinese];
+
 
 
 export function getLanguage(id: string): LanguagePack {

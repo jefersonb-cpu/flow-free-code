@@ -435,32 +435,24 @@ function Cheatsheet({ langId, query = "" }: { langId: string; query?: string }) 
       ["条件", `如果 counter 大于 3, 那么 显示 counter。\n当 score 大于等于 100, 时 说 "赢了!"。`],
       ["循环", `重复 5 次: 请把 1 加到 counter。\n连续 3 次, 显示 "嗨"。`],
     ],
-    ts: [
-      ["Declare", `let x = 5;\nconst name = "Ana";\nvar score = 0;`],
-      ["Arithmetic", `let y = 3 + 4 * 2 - 1;\nlet s = "Hello, " + name;\nlet r = 10 % 3;`],
-      ["Mutate", `x += 1;  /  x -= 2;  /  x *= 3;  /  x /= 2;\nx++;  /  ++x;  /  x--;  /  --x;`],
-      ["Print", `console.log(x);\nconsole.info("hi");  /  console.warn(x);  /  console.error(x);\nprocess.stdout.write("done");`],
-      ["If / else", `if (x > 3) console.log(x);\nif (x === 0) console.log("zero"); else console.log("nonzero");`],
-      ["Loops", `for (let i = 0; i < 5; i++) console.log(i);\nwhile (x < 10) x += 1;`],
-      ["Builtins", `Math.abs(-7);  /  Math.floor(3.9);  /  Math.max(1, 9);\nNumber("42");  /  String(7);\n"hello".toUpperCase();  /  name.length`],
-      ["Comments", `// single-line\n/* block comment */`],
-    ],
-    py: [
-      ["Assign", `x = 5\nname = "Ana"\nscore = 0`],
-      ["Arithmetic", `y = 3 + 4 * 2 - 1\ns = "Hello, " + name\nr = 17 // 5    # floor division\np = 2 ** 8     # exponent`],
-      ["Mutate", `x += 1  /  x -= 2  /  x *= 3  /  x /= 2`],
-      ["Print", `print(x)\nprint("hello")`],
-      ["If / else", `if x > 3: print(x)\nif x == 0: print("zero") else: print("nonzero")`],
-      ["Loops", `for i in range(5): print(i)\nwhile x < 10: x += 1\npass`],
-      ["Builtins", `len("hello")  /  len(name)\nsum(10, 20, 30)\nint("42")  /  str(7)\nname.upper()  /  name.lower()`],
-      ["Comments", `# single-line comment`],
-    ],
   };
 
+  // Built-in functions and extra operators are available in every language.
+  // Call style: `name(args)` or `receiver.method(args)`; `x.length` is sugar for `length(x)`.
+  const sharedExtras: Array<[string, string]> = [
+    ["Power & floor div", `2 ** 8       (exponent)\n17 // 5      (floor division)`],
+    ["Math functions", `Math.abs(-7)   /   Math.floor(3.9)   /   Math.ceil(0.1)\nMath.max(1, 9) /   Math.min(2, 5)   /   Math.sqrt(16)\nMath.round(2.6) /  Math.pow(2, 8)   /   Math.random()`],
+    ["Type casting", `Number("42")   /   String(7)        /   Boolean(0)\nparseInt("12") /   parseFloat("3.14") / isNaN(x)\nint("42")      /   float("3.14")    /   str(7)   /   bool(1)`],
+    ["String methods", `"hello".toUpperCase()   /   name.toLowerCase()\n"  hi  ".trim()         /   name.length\nupper(name)             /   lower(name)   /   len(name)`],
+    ["Aggregates", `sum(10, 20, 30)    (variadic sum)`],
+  ];
+
   const q = query.trim().toLowerCase();
-  const filtered = (rows[langId] ?? []).filter(
+  const all = [...(rows[langId] ?? []), ...sharedExtras];
+  const filtered = all.filter(
     ([label, ex]) => !q || label.toLowerCase().includes(q) || ex.toLowerCase().includes(q),
   );
+
 
 
   return (
