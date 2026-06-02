@@ -922,12 +922,20 @@ for (let i = 0; i < 5; i++) counter += 1;
 console.log(counter);
 if (counter > 3) console.log("big number!");
 counter *= 2;
+let power = counter ** 2;
+console.log("squared: " + power);
+let abs = Math.abs(-7);
+console.log("abs: " + abs);
+let label = "hello";
+console.log("len: " + label.length);
+console.log(label.toUpperCase());
 while (counter < 50) counter += 10;
 console.log("final: " + counter);`,
   operators: codeOperators,
   comparators: codeComparators,
   truthy: ["true"],
   falsy: ["false"],
+  builtins: tsBuiltins,
   patterns: [
     // Comments
     patComment(new RegExp("^\\s*//.*$")),
