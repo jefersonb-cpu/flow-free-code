@@ -44,11 +44,12 @@ export function makeExprParser(lang: LanguagePack) {
   );
 
   function parseAtom(text: string): Expr {
-    const t = text.trim();
-    const lit = parseLiteral(t, lang);
+    const raw = text.trim();
+    const lit = parseLiteral(raw, lang);
     if (lit) return lit;
+    const t = stripArticles(raw);
     if (isIdent(t)) return { kind: "var", name: t };
-    throw new ProseError(`I don't understand the value "${t}".`);
+    throw new ProseError(`I don't understand the value "${raw}".`);
   }
 
   function parse(text: string): Expr {
