@@ -5,6 +5,7 @@ import { LANGUAGES, getLanguage } from "@/lib/prose-lang/languages";
 import { run, type RunResult } from "@/lib/prose-lang/interpreter";
 import { useAuth } from "@/lib/auth-context";
 import { createSnippet, recordRun } from "@/lib/snippets";
+import { VoiceInputButton } from "@/components/voice-input-button";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
