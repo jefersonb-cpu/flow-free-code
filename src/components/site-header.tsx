@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ThemeToggle } from "./theme-toggle";
 import { useAuth } from "@/lib/auth-context";
+import { useAdmin } from "@/lib/use-admin";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "./ui/button";
 import { NotificationBell } from "./notification-bell";
@@ -8,6 +9,7 @@ import { toast } from "sonner";
 
 export function SiteHeader() {
   const { isAuthenticated, user, loading } = useAuth();
+  const { isAdmin } = useAdmin();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -65,6 +67,14 @@ export function SiteHeader() {
               >
                 History
               </Link>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="hidden text-sm font-medium text-primary hover:opacity-80 sm:inline"
+                >
+                  Admin
+                </Link>
+              )}
             </>
           )}
           <NotificationBell />
