@@ -827,6 +827,160 @@ for (const pack of [english, spanish, french, german, italian, portuguese, japan
   pack.patterns = [...x.patterns, ...pack.patterns];
 }
 
+// ---------- TypeScript ----------
+// Real code syntax. Statements are one-per-line; trailing `;` optional.
+// Use spaces around operators (e.g. `x + 1`, not `x+1`).
+const CODE_ID = "[A-Za-z_][A-Za-z0-9_]*";
+const codeOperators: LanguagePack["operators"] = {
+  "+": ["+"],
+  "-": ["-"],
+  "*": ["*"],
+  "/": ["/"],
+  "%": ["%"],
+};
+const codeComparators: LanguagePack["comparators"] = [
+  { phrase: "===", op: "==" },
+  { phrase: "!==", op: "!=" },
+  { phrase: "==", op: "==" },
+  { phrase: "!=", op: "!=" },
+  { phrase: ">=", op: ">=" },
+  { phrase: "<=", op: "<=" },
+  { phrase: ">", op: ">" },
+  { phrase: "<", op: "<" },
+];
+
+// Custom for-loop pattern: `for (let i = 0; i < N; i++) body;`
+function patForLoopC(re: RegExp): LangPattern {
+  return {
+    regex: re,
+    build: ([times, inner], parseInner, parseExpr): Stmt => ({
+      kind: "repeat",
+      times: parseExpr(times),
+      body: parseInner(inner),
+    }),
+  };
+}
+
+const typescript: LanguagePack = {
+  id: "ts",
+  name: "TypeScript",
+  flag: "📘",
+  sample: `let counter = 0;
+for (let i = 0; i < 5; i++) counter += 1;
+console.log(counter);
+if (counter > 3) console.log("big number!");
+counter *= 2;
+while (counter < 50) counter += 10;
+console.log("final: " + counter);`,
+  operators: codeOperators,
+  comparators: codeComparators,
+  truthy: ["true"],
+  falsy: ["false"],
+  patterns: [
+    // Comments
+    patComment(new RegExp("^\\s*//.*$")),
+    patComment(/^\s*\/\*.*\*\/\s*$/),
+
+    // if / else  (TS-style with parens)
+    patIfElse(new RegExp("^if\\s*\\((.+?)\\)\\s+(.+?)\\s*;?\\s+else\\s+(.+?)\\s*;?$", "i")),
+    patIf(new RegExp("^if\\s*\\((.+?)\\)\\s+(.+?)\\s*;?$", "i")),
+
+    // while
+    patWhile(new RegExp("^while\\s*\\((.+?)\\)\\s+(.+?)\\s*;?$", "i")),
+
+    // for (let i = 0; i < N; i++) body
+    patForLoopC(
+      new RegExp(
+        "^for\\s*\\(\\s*(?:let|var|const)?\\s*" + CODE_ID +
+          "\\s*=\\s*0\\s*;\\s*" + CODE_ID + "\\s*<\\s*(.+?)\\s*;\\s*" +
+          CODE_ID + "\\s*(?:\\+\\+|\\+=\\s*1)\\s*\\)\\s+(.+?)\\s*;?$",
+        "i",
+      ),
+    ),
+
+    // print
+    patPrint(new RegExp("^console\\.(?:log|info|warn|error|debug)\\s*\\((.+)\\)\\s*;?$", "i")),
+    patPrint(new RegExp("^process\\.stdout\\.write\\s*\\((.+)\\)\\s*;?$", "i")),
+
+    // compound assignment (shared shape)
+    patAddTo(new RegExp("^(" + CODE_ID + ")\\s*\\+=\\s*(.+?)\\s*;?$"), false),
+    patSubFrom(new RegExp("^(" + CODE_ID + ")\\s*-=\\s*(.+?)\\s*;?$"), false),
+    patMulBy(new RegExp("^(" + CODE_ID + ")\\s*\\*=\\s*(.+?)\\s*;?$"), false),
+    patDivBy(new RegExp("^(" + CODE_ID + ")\\s*\\/=\\s*(.+?)\\s*;?$"), false),
+
+    // increment / decrement  (x++, ++x, x--, --x)
+    patAddTo(new RegExp("^(?:\\+\\+\\s*(" + CODE_ID + ")|(" + CODE_ID + ")\\s*\\+\\+)\\s*;?$"), false),
+    {
+      regex: new RegExp("^(?:\\+\\+\\s*(" + CODE_ID + ")|(" + CODE_ID + ")\\s*\\+\\+)\\s*;?$"),
+      build: (g): Stmt => ({ kind: "addto", name: g[0] || g[1], expr: { kind: "lit", value: 1 } }),
+    },
+    {
+      regex: new RegExp("^(?:--\\s*(" + CODE_ID + ")|(" + CODE_ID + ")\\s*--)\\s*;?$"),
+      build: (g): Stmt => ({ kind: "subfrom", name: g[0] || g[1], expr: { kind: "lit", value: 1 } }),
+    },
+
+    // declarations: let / const / var
+    patAssign(new RegExp("^(?:let|const|var)\\s+(" + CODE_ID + ")(?:\\s*:\\s*[A-Za-z_][\\w<>\\[\\]\\|, ]*)?\\s*=\\s*(.+?)\\s*;?$")),
+    // bare assignment (also valid Python) — disallow `==`
+    patAssign(new RegExp("^(" + CODE_ID + ")\\s*=(?!=)\\s*(.+?)\\s*;?$")),
+  ],
+};
+
+// ---------- Python ----------
+const python: LanguagePack = {
+  id: "py",
+  name: "Python",
+  flag: "🐍",
+  sample: `counter = 0
+for i in range(5): counter += 1
+print(counter)
+if counter > 3: print("big number!")
+counter *= 2
+while counter < 50: counter += 10
+print("final: " + counter)`,
+  operators: codeOperators,
+  comparators: codeComparators,
+  truthy: ["true", "True"],
+  falsy: ["false", "False"],
+  patterns: [
+    // Comments
+    patComment(/^\s*#.*$/),
+
+    // pass / noop
+    { regex: /^\s*pass\s*$/, build: (): Stmt => ({ kind: "noop" }) },
+
+    // if / elif / else (single-line, colon-separated)
+    patIfElse(/^if\s+(.+?)\s*:\s*(.+?)\s+else\s*:\s*(.+)$/i),
+    patIf(/^if\s+(.+?)\s*:\s*(.+)$/i),
+
+    // while cond: body
+    patWhile(/^while\s+(.+?)\s*:\s*(.+)$/i),
+
+    // for i in range(N): body
+    patForLoopC(new RegExp("^for\\s+" + CODE_ID + "\\s+in\\s+range\\s*\\(\\s*(.+?)\\s*\\)\\s*:\\s*(.+)$", "i")),
+
+    // print(...)
+    patPrint(new RegExp("^print\\s*\\((.+)\\)\\s*$", "i")),
+
+    // compound assignment
+    patAddTo(new RegExp("^(" + CODE_ID + ")\\s*\\+=\\s*(.+)$"), false),
+    patSubFrom(new RegExp("^(" + CODE_ID + ")\\s*-=\\s*(.+)$"), false),
+    patMulBy(new RegExp("^(" + CODE_ID + ")\\s*\\*=\\s*(.+)$"), false),
+    patDivBy(new RegExp("^(" + CODE_ID + ")\\s*\\/=\\s*(.+)$"), false),
+
+    // bare assignment (shared with TS) — disallow `==`
+    patAssign(new RegExp("^(" + CODE_ID + ")\\s*=(?!=)\\s*(.+)$")),
+  ],
+};
+
+[typescript, python].forEach((p) => {
+  p.baseId = p.id;
+  p.register = "normal";
+});
+
+
+
+
 
 // ---------- Slang factory ----------
 function makeSlang(
@@ -1064,10 +1218,13 @@ export const LANGUAGES: LanguagePack[] = [
   portuguese, portugueseSlang,
   japanese, japaneseSlang,
   chinese, chineseSlang,
+  typescript,
+  python,
 ];
 
 /** Base language entries (unique by baseId), used for the language picker. */
-export const BASE_LANGUAGES = [english, spanish, french, german, italian, portuguese, japanese, chinese];
+export const BASE_LANGUAGES = [english, spanish, french, german, italian, portuguese, japanese, chinese, typescript, python];
+
 
 export function getLanguage(id: string): LanguagePack {
   return LANGUAGES.find((l) => l.id === id) ?? english;
