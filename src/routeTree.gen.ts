@@ -28,6 +28,7 @@ import { Route as SnippetsIdRouteImport } from './routes/snippets.$id'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedMySnippetsRouteImport } from './routes/_authenticated/my-snippets'
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const TestimonialsRoute = TestimonialsRouteImport.update({
   id: '/testimonials',
@@ -123,6 +124,11 @@ const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
   path: '/history',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/my-snippets': typeof AuthenticatedMySnippetsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/history': typeof AuthenticatedHistoryRoute
   '/my-snippets': typeof AuthenticatedMySnippetsRoute
   '/profile': typeof AuthenticatedProfileRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/testimonials': typeof TestimonialsRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/history': typeof AuthenticatedHistoryRoute
   '/_authenticated/my-snippets': typeof AuthenticatedMySnippetsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
@@ -202,6 +211,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/testimonials'
+    | '/dashboard'
     | '/history'
     | '/my-snippets'
     | '/profile'
@@ -222,6 +232,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/testimonials'
+    | '/dashboard'
     | '/history'
     | '/my-snippets'
     | '/profile'
@@ -243,6 +254,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/testimonials'
+    | '/_authenticated/dashboard'
     | '/_authenticated/history'
     | '/_authenticated/my-snippets'
     | '/_authenticated/profile'
@@ -404,16 +416,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHistoryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
   AuthenticatedMySnippetsRoute: typeof AuthenticatedMySnippetsRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
   AuthenticatedMySnippetsRoute: AuthenticatedMySnippetsRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
