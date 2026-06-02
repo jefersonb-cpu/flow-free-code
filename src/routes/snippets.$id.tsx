@@ -17,6 +17,9 @@ import { run } from "@/lib/prose-lang/interpreter";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CommentsSection } from "@/components/comments-section";
+import { RatingWidget } from "@/components/rating-widget";
+import { ShareButtons } from "@/components/share-buttons";
 
 export const Route = createFileRoute("/snippets/$id")({
   head: () => ({
@@ -233,6 +236,15 @@ function SnippetDetail() {
         ))}
         {errMsg && <div className="mt-2 text-destructive">⚠ {errMsg}</div>}
       </div>
+
+      {snippet.visibility === "public" && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card/40 px-5 py-3">
+          <RatingWidget snippetId={snippet.id} />
+          <ShareButtons title={snippet.title} path={`/snippets/${snippet.id}`} />
+        </div>
+      )}
+
+      <CommentsSection snippetId={snippet.id} snippetOwnerId={snippet.owner_id} />
     </div>
   );
 }

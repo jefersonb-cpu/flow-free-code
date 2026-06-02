@@ -3,6 +3,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "./ui/button";
+import { NotificationBell } from "./notification-bell";
 import { toast } from "sonner";
 
 export function SiteHeader() {
@@ -52,6 +53,7 @@ export function SiteHeader() {
               </Link>
             </>
           )}
+          <NotificationBell />
           <ThemeToggle />
           {loading ? null : isAuthenticated ? (
             <>
