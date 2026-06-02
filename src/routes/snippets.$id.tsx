@@ -236,6 +236,15 @@ function SnippetDetail() {
         ))}
         {errMsg && <div className="mt-2 text-destructive">⚠ {errMsg}</div>}
       </div>
+
+      {snippet.visibility === "public" && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card/40 px-5 py-3">
+          <RatingWidget snippetId={snippet.id} />
+          <ShareButtons title={snippet.title} path={`/snippets/${snippet.id}`} />
+        </div>
+      )}
+
+      <CommentsSection snippetId={snippet.id} snippetOwnerId={snippet.owner_id} />
     </div>
   );
 }
