@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Play, Sparkles, BookOpen, RotateCcw } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Play, Sparkles, BookOpen, RotateCcw, Search } from "lucide-react";
 import { LANGUAGES, getLanguage } from "@/lib/prose-lang/languages";
 import { run, type RunResult } from "@/lib/prose-lang/interpreter";
 
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Write programs as coherent sentences in English, Spanish, French, German, or Italian. Each sentence is a real command.",
+          "Write programs as coherent sentences in 8 human languages — English, Spanish, French, German, Italian, Portuguese, Japanese, Chinese. Each sentence is a real command.",
       },
       { property: "og:title", content: "Prosa — Code in plain language" },
       {
@@ -29,6 +29,8 @@ function Index() {
   const [source, setSource] = useState(lang.sample);
   const [result, setResult] = useState<RunResult | null>(null);
   const [showCheatsheet, setShowCheatsheet] = useState(false);
+  const [query, setQuery] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const onLangChange = (id: string) => {
     const next = getLanguage(id);
@@ -43,39 +45,62 @@ function Index() {
     setResult(null);
   };
 
+  // Cmd/Ctrl+Enter runs the program from inside the editor.
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        setResult(run(el.value, lang));
+      }
+    };
+    el.addEventListener("keydown", onKey);
+    return () => el.removeEventListener("keydown", onKey);
+  }, [lang]);
+
   return (
-    <main className="min-h-screen px-4 py-10 sm:px-8 sm:py-16">
+    <section className="px-4 py-10 sm:px-8 sm:py-16" aria-labelledby="prosa-heading">
       <div className="mx-auto max-w-6xl">
         <header className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border bg-card/60 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              <span>Five human languages · one runtime</span>
+              <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+              <span>Eight human languages · one runtime</span>
             </div>
-            <h1 className="font-serif text-5xl leading-none tracking-tight text-foreground sm:text-6xl">
+            <h1
+              id="prosa-heading"
+              className="font-serif text-5xl leading-none tracking-tight text-foreground sm:text-6xl"
+            >
               Prosa<span className="text-primary">.</span>
             </h1>
             <p className="mt-3 max-w-xl text-base text-muted-foreground">
               Write programs as coherent sentences. Every command is real grammar — and real code.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {LANGUAGES.map((l) => (
-              <button
-                key={l.id}
-                onClick={() => onLangChange(l.id)}
-                className={[
-                  "rounded-md border px-3 py-2 text-sm transition-all",
-                  l.id === langId
-                    ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
-                    : "border-border bg-card/60 text-foreground hover:border-primary/50",
-                ].join(" ")}
-              >
-                <span className="mr-1.5">{l.flag}</span>
-                {l.name}
-              </button>
-            ))}
-          </div>
+          <nav className="flex flex-wrap gap-2" aria-label="Choose a human language">
+            {LANGUAGES.map((l) => {
+              const active = l.id === langId;
+              return (
+                <button
+                  key={l.id}
+                  type="button"
+                  onClick={() => onLangChange(l.id)}
+                  aria-pressed={active}
+                  aria-label={`Use ${l.name}`}
+                  className={[
+                    "min-h-11 rounded-md border px-3 py-2 text-sm transition-all",
+                    active
+                      ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
+                      : "border-border bg-card/60 text-foreground hover:border-primary/50",
+                  ].join(" ")}
+                >
+                  <span className="mr-1.5" aria-hidden="true">{l.flag}</span>
+                  {l.name}
+                </button>
+              );
+            })}
+          </nav>
         </header>
 
         <div className="grid gap-6 lg:grid-cols-5">
@@ -92,49 +117,72 @@ function Index() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={onReset}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition hover:text-foreground"
+                    aria-label="Reset editor to the sample program"
                     title="Reset to sample"
+                    className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition hover:text-foreground"
                   >
-                    <RotateCcw className="h-3.5 w-3.5" />
+                    <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
                     Reset
                   </button>
                   <button
+                    type="button"
                     onClick={onRun}
-                    className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:brightness-110"
+                    aria-label="Run program (Ctrl or Cmd + Enter)"
+                    title="Run (⌘/Ctrl + Enter)"
+                    className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:brightness-110"
                   >
-                    <Play className="h-3.5 w-3.5" />
+                    <Play className="h-3.5 w-3.5" aria-hidden="true" />
                     Run
                   </button>
                 </div>
               </div>
+              <label htmlFor="prosa-editor" className="sr-only">
+                Prosa source code
+              </label>
               <textarea
+                id="prosa-editor"
+                ref={textareaRef}
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
                 spellCheck={false}
+                aria-describedby="prosa-editor-hint"
                 className="min-h-[360px] w-full resize-y bg-transparent p-5 font-mono text-sm leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
                 placeholder={lang.sample}
               />
+              <p id="prosa-editor-hint" className="sr-only">
+                Press Control or Command plus Enter to run the program.
+              </p>
             </div>
 
             <div className="mt-4 overflow-hidden rounded-xl border border-border bg-card/70">
               <div className="border-b border-border bg-card/40 px-4 py-2 font-mono text-xs text-muted-foreground">
                 output
               </div>
-              <div className="min-h-[120px] p-5 font-mono text-sm">
+              <div
+                className="min-h-[120px] p-5 font-mono text-sm"
+                role="status"
+                aria-live="polite"
+                aria-atomic="false"
+              >
                 {!result && (
                   <span className="text-muted-foreground">
-                    Press <span className="text-primary">Run</span> to execute your sentences.
+                    Press <span className="text-primary">Run</span> to execute your sentences
+                    {" "}<kbd className="rounded border border-border bg-card px-1.5 py-0.5 text-[10px] text-foreground">⌘/Ctrl + Enter</kbd>.
                   </span>
                 )}
                 {result?.output.map((line, i) => (
                   <div key={i} className="text-foreground">
-                    <span className="mr-2 text-muted-foreground">›</span>
+                    <span className="mr-2 text-muted-foreground" aria-hidden="true">›</span>
                     {line}
                   </div>
                 ))}
                 {result?.error && (
-                  <div className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-destructive-foreground">
+                  <div
+                    role="alert"
+                    className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-destructive-foreground"
+                  >
                     <div className="text-destructive">⚠ {result.error.message}</div>
                     {result.error.sentence && (
                       <div className="mt-1 text-xs text-muted-foreground">
@@ -150,11 +198,14 @@ function Index() {
           <aside className="lg:col-span-2">
             <div className="rounded-xl border border-border bg-card p-6">
               <button
+                type="button"
                 onClick={() => setShowCheatsheet((v) => !v)}
+                aria-expanded={showCheatsheet}
+                aria-controls="cheatsheet-panel"
                 className="mb-4 flex w-full items-center justify-between text-left"
               >
                 <div className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-primary" />
+                  <BookOpen className="h-4 w-4 text-primary" aria-hidden="true" />
                   <h2 className="font-serif text-2xl">Grammar of {lang.name}</h2>
                 </div>
                 <span className="text-xs text-muted-foreground">
@@ -163,7 +214,26 @@ function Index() {
               </button>
 
               {showCheatsheet ? (
-                <Cheatsheet langId={lang.id} />
+                <div id="cheatsheet-panel">
+                  <div className="relative mb-3">
+                    <Search
+                      className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                    <label htmlFor="cheatsheet-search" className="sr-only">
+                      Search grammar
+                    </label>
+                    <input
+                      id="cheatsheet-search"
+                      type="search"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Search the grammar…"
+                      className="h-10 w-full rounded-md border border-border bg-background pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground"
+                    />
+                  </div>
+                  <Cheatsheet langId={lang.id} query={query} />
+                </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
                   Each sentence ends with a period. Commands chain top to bottom. Inline
@@ -190,11 +260,11 @@ function Index() {
           Prosa interprets your prose — no AI, just grammar.
         </footer>
       </div>
-    </main>
+    </section>
   );
 }
 
-function Cheatsheet({ langId }: { langId: string }) {
+function Cheatsheet({ langId, query = "" }: { langId: string; query?: string }) {
   const rows: Record<string, Array<[string, string]>> = {
     en: [
       ["Assign", `Let x be 5.  /  Set x to "hi".  /  Define score as 0.\nSuppose age is 30.  /  Now total becomes 100.\nCreate a variable called name with the value "Ana".\nStore 42 in answer.  /  Assign 7 to lucky.`],
@@ -262,9 +332,17 @@ function Cheatsheet({ langId }: { langId: string }) {
     ],
   };
 
+  const q = query.trim().toLowerCase();
+  const filtered = rows[langId].filter(
+    ([label, ex]) => !q || label.toLowerCase().includes(q) || ex.toLowerCase().includes(q),
+  );
+
   return (
     <div className="space-y-3">
-      {rows[langId].map(([label, ex]) => (
+      {filtered.length === 0 && (
+        <p className="text-sm text-muted-foreground">No matches for "{query}".</p>
+      )}
+      {filtered.map(([label, ex]) => (
         <div key={label} className="border-l-2 border-primary/40 pl-3">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
           <div className="mt-0.5 whitespace-pre-line font-mono text-sm text-foreground">{ex}</div>
