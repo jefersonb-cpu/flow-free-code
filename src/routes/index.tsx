@@ -206,7 +206,7 @@ function Index() {
           Prosa interprets your prose — no AI, just grammar.
         </footer>
       </div>
-    </main>
+    </section>
   );
 }
 
