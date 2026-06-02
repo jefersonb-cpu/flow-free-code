@@ -117,29 +117,43 @@ function Index() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
                     onClick={onReset}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition hover:text-foreground"
+                    aria-label="Reset editor to the sample program"
                     title="Reset to sample"
+                    className="inline-flex min-h-9 items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1.5 text-xs text-muted-foreground transition hover:text-foreground"
                   >
-                    <RotateCcw className="h-3.5 w-3.5" />
+                    <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
                     Reset
                   </button>
                   <button
+                    type="button"
                     onClick={onRun}
-                    className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:brightness-110"
+                    aria-label="Run program (Ctrl or Cmd + Enter)"
+                    title="Run (⌘/Ctrl + Enter)"
+                    className="inline-flex min-h-9 items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition hover:brightness-110"
                   >
-                    <Play className="h-3.5 w-3.5" />
+                    <Play className="h-3.5 w-3.5" aria-hidden="true" />
                     Run
                   </button>
                 </div>
               </div>
+              <label htmlFor="prosa-editor" className="sr-only">
+                Prosa source code
+              </label>
               <textarea
+                id="prosa-editor"
+                ref={textareaRef}
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
                 spellCheck={false}
+                aria-describedby="prosa-editor-hint"
                 className="min-h-[360px] w-full resize-y bg-transparent p-5 font-mono text-sm leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
                 placeholder={lang.sample}
               />
+              <p id="prosa-editor-hint" className="sr-only">
+                Press Control or Command plus Enter to run the program.
+              </p>
             </div>
 
             <div className="mt-4 overflow-hidden rounded-xl border border-border bg-card/70">
