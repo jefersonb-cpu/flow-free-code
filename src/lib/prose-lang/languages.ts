@@ -466,7 +466,204 @@ Infine, stampa "Il valore finale è " più il contatore.`,
   ],
 };
 
-export const LANGUAGES: LanguagePack[] = [english, spanish, french, german, italian];
+// ---------- Portuguese ----------
+const portuguese: LanguagePack = {
+  id: "pt",
+  name: "Português",
+  flag: "🇵🇹",
+  sample: `Seja o contador igual a 0.
+Repita 5 vezes: por favor some 1 ao contador.
+Por favor mostre o contador.
+Se o contador é maior que 3, então diga "Que número grande!".
+Agora dê ao contador 10 a mais.
+Finalmente, imprima "O valor final é " mais o contador.`,
+  operators: {
+    "+": ["mais", "somado a"],
+    "-": ["menos"],
+    "*": ["vezes", "multiplicado por"],
+    "/": ["dividido por", "sobre"],
+  },
+  comparators: [
+    { phrase: "é maior ou igual a", op: ">=" },
+    { phrase: "é menor ou igual a", op: "<=" },
+    { phrase: "é pelo menos", op: ">=" },
+    { phrase: "é no máximo", op: "<=" },
+    { phrase: "é maior que", op: ">" },
+    { phrase: "é menor que", op: "<" },
+    { phrase: "não é igual a", op: "!=" },
+    { phrase: "é diferente de", op: "!=" },
+    { phrase: "é igual a", op: "==" },
+    { phrase: "equivale a", op: "==" },
+    { phrase: "é", op: "==" },
+  ],
+  truthy: ["verdadeiro", "sim"],
+  falsy: ["falso", "não", "nao"],
+  patterns: [
+    patAssign(/^(?:Por\s+favor\s+)?Seja\s+(?:o\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)\s+igual\s+a\s+(.+)$/i),
+    patAssign(/^(?:Por\s+favor\s+)?Defina\s+(?:o\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)\s+como\s+(.+)$/i),
+    patAssign(/^(?:Por\s+favor\s+)?Faça\s+(?:o\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)\s+(?:ser|valer)\s+(.+)$/i),
+    patAssign(/^Suponha\s+que\s+(?:o\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)\s+(?:é|seja|vale)\s+(.+)$/i),
+    patAssign(/^Agora\s+(?:o\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)\s+(?:é|vale|se\s+torna)\s+(.+)$/i),
+    patAssign(/^(?:Crie|Declare)\s+(?:uma\s+)?(?:nova\s+)?(?:variável\s+)?(?:chamada\s+)?([A-Za-zÀ-ÿ_]\w*)\s+(?:com\s+(?:o\s+)?valor\s+|igual\s+a\s+|como\s+)(.+)$/i),
+    patAssignSwapped(/^(?:Por\s+favor\s+)?(?:Guarde|Armazene|Coloque)\s+(.+?)\s+em\s+(?:o\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)$/i),
+    patAssignSwapped(/^(?:Por\s+favor\s+)?Atribua\s+(.+?)\s+a\s+(?:o\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)$/i),
+
+    patAddTo(/^(?:Por\s+favor\s+)?(?:Some|Adicione|Acrescente)\s+(.+?)\s+(?:a|ao|à)\s+(?:o\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)$/i, true),
+    patAddTo(/^(?:Por\s+favor\s+)?(?:Aumente|Incremente|Eleve)\s+(?:o\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)\s+em\s+(.+)$/i, false),
+    patAddTo(/^(?:Por\s+favor\s+)?Dê\s+(?:ao\s+|à\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)\s+(.+?)\s+a\s+mais$/i, false),
+
+    patSubFrom(/^(?:Por\s+favor\s+)?(?:Subtraia|Tire|Remova)\s+(.+?)\s+(?:de|do|da)\s+(?:o\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)$/i, true),
+    patSubFrom(/^(?:Por\s+favor\s+)?(?:Diminua|Decremente|Reduza)\s+(?:o\s+|a\s+)?([A-Za-zÀ-ÿ_]\w*)\s+em\s+(.+)$/i, false),
+
+    patIf(/^Se\s+(.+?),\s*(?:então\s+|entao\s+)?(.+)$/i),
+    patIf(/^Quando\s+(.+?),\s*(.+)$/i),
+    patIf(/^Caso\s+(.+?),\s*(.+)$/i),
+    patIf(/^Sempre\s+que\s+(.+?),\s*(.+)$/i),
+
+    patRepeat(/^(?:Por\s+favor\s+)?Repita\s+(.+?)\s+vezes:?\s+(.+)$/i),
+    patRepeat(/^Faça\s+o\s+seguinte\s+(.+?)\s+vezes:?\s+(.+)$/i),
+    patRepeat(/^(.+?)\s+vezes\s+seguidas,?\s+(.+)$/i),
+
+    patPrint(/^(?:Por\s+favor\s+|Agora\s+|Finalmente,?\s+)?(?:Mostre|Imprima|Diga|Escreva|Anuncie|Exiba)\s+(?:me\s+|o\s+valor\s+de\s+)?(.+)$/i),
+    patPrint(/^(?:Por\s+favor\s+)?Diga[- ]me\s+(?:o\s+valor\s+de\s+|sobre\s+)?(.+)$/i),
+    patPrint(/^Quanto\s+(?:vale|é)\s+(.+?)\??$/i),
+  ],
+};
+
+// ---------- Japanese ----------
+// Japanese identifiers in samples use latin names (counter, x) for clarity,
+// but the engine accepts CJK identifiers too.
+const JID = "[A-Za-z_\\u3040-\\u309F\\u30A0-\\u30FF\\u4E00-\\u9FFF][A-Za-z0-9_\\u3040-\\u309F\\u30A0-\\u30FF\\u4E00-\\u9FFF]*";
+const japanese: LanguagePack = {
+  id: "ja",
+  name: "日本語",
+  flag: "🇯🇵",
+  sample: `counter を 0 にする。
+5 回 繰り返す: counter に 1 を 足す。
+counter を 表示する。
+もし counter が 3 より大きい なら、 "大きい数だ！" を 表示する。
+counter に 10 を 足す。
+"最終値は " 足す counter を 表示する。`,
+  operators: {
+    "+": ["足す", "プラス", "たす"],
+    "-": ["引く", "マイナス", "ひく"],
+    "*": ["掛ける", "かける", "×"],
+    "/": ["割る", "わる"],
+  },
+  comparators: [
+    // longer phrases first
+    { phrase: "以上", op: ">=" },
+    { phrase: "以下", op: "<=" },
+    { phrase: "より大きい", op: ">" },
+    { phrase: "より小さい", op: "<" },
+    { phrase: "と等しくない", op: "!=" },
+    { phrase: "と異なる", op: "!=" },
+    { phrase: "と等しい", op: "==" },
+    { phrase: "と同じ", op: "==" },
+  ],
+  truthy: ["真", "はい"],
+  falsy: ["偽", "いいえ"],
+  patterns: [
+    // Assign:  "X を 5 にする"  /  "X は 5 とする"
+    patAssign(new RegExp("^(" + JID + ")\\s+を\\s+(.+?)\\s+にする$", "i")),
+    patAssign(new RegExp("^(" + JID + ")\\s+は\\s+(.+?)\\s+(?:とする|だ)$", "i")),
+    patAssignSwapped(new RegExp("^(.+?)\\s+を\\s+(" + JID + ")\\s+に\\s+(?:代入する|入れる|保存する)$", "i")),
+
+    // Add: "X に N を 足す" → name=X, expr=N (exprFirst=false captures [name,expr])
+    patAddTo(new RegExp("^(" + JID + ")\\s+に\\s+(.+?)\\s+を\\s+(?:足す|加える)$", "i"), false),
+    patAddTo(new RegExp("^(" + JID + ")\\s+を\\s+(.+?)\\s+(?:増やす|増加させる)$", "i"), false),
+
+    // Sub: "X から N を 引く"
+    patSubFrom(new RegExp("^(" + JID + ")\\s+から\\s+(.+?)\\s+を\\s+引く$", "i"), false),
+    patSubFrom(new RegExp("^(" + JID + ")\\s+を\\s+(.+?)\\s+(?:減らす|減少させる)$", "i"), false),
+
+    // If: "もし <cond> なら、 <stmt>"
+    patIf(/^もし\s+(.+?)\s+なら[、,]\s*(.+)$/i),
+    patIf(/^(.+?)\s+の場合[、,]\s*(.+)$/i),
+
+    // Repeat: "5 回 繰り返す: <stmt>"
+    patRepeat(/^(.+?)\s+回\s+繰り返す[：:]\s*(.+)$/i),
+    patRepeat(/^(.+?)\s+回[、,]\s*(.+)$/i),
+
+    // Print: "X を 表示する"  /  "X と 言う"
+    patPrint(/^(.+?)\s+を\s+(?:表示|出力|印刷|表示する)する?$/i),
+    patPrint(/^(.+?)\s+と\s+(?:言う|表示する|出力する|書く)$/i),
+  ],
+};
+
+// ---------- Chinese (Simplified) ----------
+const chinese: LanguagePack = {
+  id: "zh",
+  name: "中文",
+  flag: "🇨🇳",
+  sample: `设 counter 为 0。
+重复 5 次: 请把 1 加到 counter。
+请显示 counter。
+如果 counter 大于 3, 那么 显示 "好大的数!"。
+把 10 加到 counter。
+显示 "最终值是 " 加 counter。`,
+  operators: {
+    "+": ["加", "加上"],
+    "-": ["减", "减去"],
+    "*": ["乘", "乘以"],
+    "/": ["除以"],
+  },
+  comparators: [
+    { phrase: "大于等于", op: ">=" },
+    { phrase: "小于等于", op: "<=" },
+    { phrase: "至少是", op: ">=" },
+    { phrase: "至多是", op: "<=" },
+    { phrase: "大于", op: ">" },
+    { phrase: "小于", op: "<" },
+    { phrase: "不等于", op: "!=" },
+    { phrase: "等于", op: "==" },
+    { phrase: "是", op: "==" },
+  ],
+  truthy: ["真", "是"],
+  falsy: ["假", "否"],
+  patterns: [
+    // Assign
+    patAssign(/^(?:请\s*)?设\s+([A-Za-z_]\w*)\s+为\s+(.+)$/i),
+    patAssign(/^(?:请\s*)?让\s+([A-Za-z_]\w*)\s+等于\s+(.+)$/i),
+    patAssign(/^(?:请\s*)?定义\s+([A-Za-z_]\w*)\s+为\s+(.+)$/i),
+    patAssign(/^现在\s+([A-Za-z_]\w*)\s+(?:是|等于|变成)\s+(.+)$/i),
+    patAssignSwapped(/^(?:请\s*)?(?:把|将)\s+(.+?)\s+(?:存入|保存到|赋值给)\s+([A-Za-z_]\w*)$/i),
+
+    // Add: "把 N 加到 X" — expr first
+    patAddTo(/^(?:请\s*)?(?:把|将)\s+(.+?)\s+加到\s+([A-Za-z_]\w*)(?:\s+上)?$/i, true),
+    patAddTo(/^(?:请\s*)?(?:增加|增大)\s+([A-Za-z_]\w*)\s+(.+)$/i, false),
+    patAddTo(/^(?:请\s*)?让\s+([A-Za-z_]\w*)\s+增加\s+(.+)$/i, false),
+
+    // Sub: "从 X 中 减去 N"
+    patSubFrom(/^(?:请\s*)?从\s+([A-Za-z_]\w*)\s+中?\s*减去\s+(.+)$/i, false),
+    patSubFrom(/^(?:请\s*)?(?:减少|降低)\s+([A-Za-z_]\w*)\s+(.+)$/i, false),
+
+    // If
+    patIf(/^如果\s+(.+?)[,，]\s*(?:那么|则)?\s*(.+)$/i),
+    patIf(/^当\s+(.+?)[,，]\s*(?:时)?\s*(.+)$/i),
+    patIf(/^假如\s+(.+?)[,，]\s*(.+)$/i),
+
+    // Repeat
+    patRepeat(/^(?:请\s*)?重复\s+(.+?)\s+次[:：]\s*(.+)$/i),
+    patRepeat(/^做\s+(.+?)\s+次以下事情[:：]\s*(.+)$/i),
+    patRepeat(/^连续\s+(.+?)\s+次[,，]\s*(.+)$/i),
+
+    // Print
+    patPrint(/^(?:请\s*|现在\s*|最后[,，]?\s*)?(?:显示|打印|输出|说|告诉我)\s+(?:一下\s+|关于\s+|的值\s+)?(.+)$/i),
+    patPrint(/^(.+?)\s+是\s*多少\??$/i),
+  ],
+};
+
+export const LANGUAGES: LanguagePack[] = [
+  english,
+  spanish,
+  french,
+  german,
+  italian,
+  portuguese,
+  japanese,
+  chinese,
+];
 export function getLanguage(id: string): LanguagePack {
   return LANGUAGES.find((l) => l.id === id) ?? english;
 }

@@ -6,15 +6,20 @@ export class ProseError extends Error {
   }
 }
 
-const isIdent = (s: string) => /^[A-Za-zÀ-ÿ_][A-Za-zÀ-ÿ0-9_]*$/.test(s);
+const isIdent = (s: string) =>
+  /^[A-Za-zÀ-ÿ_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF][A-Za-zÀ-ÿ0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]*$/.test(s);
 
 // Leading articles across supported languages — stripped before resolving an identifier.
-const ARTICLE_RE = /^(?:the|a|an|el|la|los|las|un|una|le|les|l'|un|une|der|die|das|den|dem|des|ein|eine|einen|einem|einer|il|lo|gli|i|uno)\s+/i;
+const ARTICLE_RE = /^(?:the|a|an|el|la|los|las|un|una|le|les|l'|une|der|die|das|den|dem|des|ein|eine|einen|einem|einer|il|lo|gli|i|uno|o|os|as|um|uma)\s+/i;
+// Trailing particles (Japanese / Chinese) — also stripped when resolving an identifier.
+const TRAILING_PARTICLE_RE = /\s*(?:を|は|が|に|の|へ|で|と|から|まで|より|や|も|的|了|呢|吧|啊)\s*$/;
 
 function stripArticles(s: string): string {
   let t = s.trim();
   while (true) {
-    const next = t.replace(ARTICLE_RE, "").trim();
+    const a = t.replace(ARTICLE_RE, "");
+    const b = a.replace(TRAILING_PARTICLE_RE, "");
+    const next = b.trim();
     if (next === t) return t;
     t = next;
   }
@@ -73,22 +78,25 @@ export function makeCondParser(lang: LanguagePack) {
   return function parse(text: string): Cond {
     const t = text.trim();
     for (const { phrase, op } of cmps) {
-      const re = new RegExp(
-        "^(.+?)\\s+" + phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s+(.+)$",
-        "i",
-      );
-      const m = t.match(re);
-      if (m) return { op, left: parseExpr(m[1]), right: parseExpr(m[2]) };
+      const esc = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      // Standard order: "left <phrase> right"
+      const reMid = new RegExp("^(.+?)\\s+" + esc + "\\s+(.+)$", "i");
+      const m1 = t.match(reMid);
+      if (m1) return { op, left: parseExpr(m1[1]), right: parseExpr(m1[2]) };
+      // Suffix order (Japanese/Chinese): "left right <phrase>"  e.g. "x が 3 より大きい"
+      const reEnd = new RegExp("^(.+)\\s+(\\S+)\\s+" + esc + "$", "i");
+      const m2 = t.match(reEnd);
+      if (m2) return { op, left: parseExpr(m2[1]), right: parseExpr(m2[2]) };
     }
     throw new ProseError(`I can't read the condition "${text}".`);
   };
 }
 
 export function parseProgram(source: string, lang: LanguagePack): Stmt[] {
-  // Split on periods or newlines only (avoids breaking on "!" inside quoted strings).
+  // Split on Latin period+space, CJK period (。), or newlines. Avoids breaking on "!" inside strings.
   const raw = source
     .replace(/\r\n/g, "\n")
-    .split(/(?<=\.)\s+|\n+/)
+    .split(/(?<=\.)\s+|(?<=[。｡])\s*|\n+/)
     .map((s) => s.trim())
     .filter(Boolean);
 
@@ -96,7 +104,7 @@ export function parseProgram(source: string, lang: LanguagePack): Stmt[] {
   const parseCond = makeCondParser(lang);
 
   function parseSentence(sentence: string): Stmt {
-    const text = sentence.replace(/[.!?]+$/, "").trim();
+    const text = sentence.replace(/[.!?。｡！？]+$/, "").trim();
     for (const p of lang.patterns) {
       const m = text.match(p.regex);
       if (m) {
