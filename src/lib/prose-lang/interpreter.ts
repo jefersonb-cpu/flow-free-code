@@ -103,8 +103,19 @@ export function parseProgram(source: string, lang: LanguagePack): Stmt[] {
   const parseExpr = makeExprParser(lang);
   const parseCond = makeCondParser(lang);
 
+  // Discourse openers stripped from the start of any sentence before pattern matching.
+  // Covers all supported languages so patterns don't each need to list them.
+  const OPENERS_RE =
+    /^(?:please|kindly|now|finally,?|then,?|next,?|after\s+that,?|por\s+favor|ahora|finalmente,?|luego,?|entonces,?|s'il\s+te\s+pla[îi]t|maintenant|enfin,?|ensuite,?|puis,?|bitte|jetzt|schliesslich,?|dann,?|danach,?|per\s+favore|ora|adesso|infine,?|poi,?|dopo,?|agora|finalmente,?|depois,?|então,?|entao,?|请|现在|最后[,，]?|然后[,，]?|接下来[,，]?)\s+/i;
+
   function parseSentence(sentence: string): Stmt {
-    const text = sentence.replace(/[.!?。｡！？]+$/, "").trim();
+    let text = sentence.replace(/[.!?。｡！？]+$/, "").trim();
+    // Strip one or more leading discourse openers so patterns match the core sentence.
+    while (true) {
+      const next = text.replace(OPENERS_RE, "");
+      if (next === text) break;
+      text = next.trim();
+    }
     for (const p of lang.patterns) {
       const m = text.match(p.regex);
       if (m) {
