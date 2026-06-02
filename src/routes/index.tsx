@@ -236,6 +236,30 @@ function Cheatsheet({ langId }: { langId: string }) {
       ["Se", `Se x è maggiore di 3, allora mostra x.\nQuando score è almeno 100, dì "vinto!".\nNel caso in cui eta sia al massimo 17, mostra "minorenne".`],
       ["Ripetere", `Ripeti 5 volte: per favore aggiungi 1 a x.\nFai questo 3 volte: mostra "ciao".\n4 volte di seguito, aumenta x di 2.`],
     ],
+    pt: [
+      ["Atribuir", `Seja x igual a 5.  /  Defina score como 0.\nSuponha que idade é 30.  /  Agora total se torna 100.\nCrie uma variável chamada nome com o valor "Ana".\nGuarde 42 em resposta.  /  Atribua 7 a sorte.`],
+      ["Aritmética", `Seja y igual a 3 mais 4 vezes 2 menos 1.`],
+      ["Modificar", `Some 1 ao x.  /  Aumente x em 1.\nDê ao x 5 a mais.  /  Tire 3 do x.  /  Diminua x em 1.`],
+      ["Mostrar", `Mostre x.  /  Imprima o valor de x.\nPor favor diga "oi".  /  Diga-me o valor de score.\nQuanto vale x?`],
+      ["Se", `Se x é maior que 3, então mostre x.\nQuando score é pelo menos 100, diga "vitória!".\nCaso idade é no máximo 17, mostre "menor".`],
+      ["Repetir", `Repita 5 vezes: por favor some 1 ao x.\nFaça o seguinte 3 vezes: mostre "oi".\n4 vezes seguidas, aumente x em 2.`],
+    ],
+    ja: [
+      ["代入", `counter を 0 にする。\nx は 10 とする。\n42 を answer に 代入する。`],
+      ["計算", `3 足す 4 掛ける 2 引く 1`],
+      ["変更", `counter に 1 を 足す。\ncounter を 2 増やす。\ncounter から 3 を 引く。\ncounter を 1 減らす。`],
+      ["表示", `counter を 表示する。\n"こんにちは" と 言う。`],
+      ["条件", `もし counter が 3 より大きい なら、 counter を 表示する。\nもし score が 100 以上 なら、 "勝ち！" と 言う。`],
+      ["繰り返し", `5 回 繰り返す: counter に 1 を 足す。\n3 回、 "やあ" と 言う。`],
+    ],
+    zh: [
+      ["赋值", `设 counter 为 0。\n让 x 等于 10。\n把 42 赋值给 answer。`],
+      ["运算", `3 加 4 乘 2 减 1`],
+      ["修改", `把 1 加到 counter。\n增加 counter 2。\n从 counter 减去 3。\n减少 counter 1。`],
+      ["显示", `显示 counter。\n请 输出 "你好"。\n告诉我 score 的值。`],
+      ["条件", `如果 counter 大于 3, 那么 显示 counter。\n当 score 大于等于 100, 时 说 "赢了!"。`],
+      ["循环", `重复 5 次: 请把 1 加到 counter。\n连续 3 次, 显示 "嗨"。`],
+    ],
   };
 
   return (
