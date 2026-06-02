@@ -78,6 +78,48 @@ function patRepeatSwapped(re: RegExp): LangPattern {
     }),
   };
 }
+function patMulBy(re: RegExp, exprFirst = false): LangPattern {
+  return {
+    regex: re,
+    build: (g, _i, parseExpr): Stmt => {
+      const [expr, name] = exprFirst ? [g[0], g[1]] : [g[1], g[0]];
+      return { kind: "mulby", name, expr: parseExpr(expr) };
+    },
+  };
+}
+function patDivBy(re: RegExp, exprFirst = false): LangPattern {
+  return {
+    regex: re,
+    build: (g, _i, parseExpr): Stmt => {
+      const [expr, name] = exprFirst ? [g[0], g[1]] : [g[1], g[0]];
+      return { kind: "divby", name, expr: parseExpr(expr) };
+    },
+  };
+}
+function patWhile(re: RegExp): LangPattern {
+  return {
+    regex: re,
+    build: ([cond, inner], parseInner, _e, parseCond): Stmt => ({
+      kind: "while",
+      cond: parseCond(cond),
+      body: parseInner(inner),
+    }),
+  };
+}
+function patIfElse(re: RegExp): LangPattern {
+  return {
+    regex: re,
+    build: ([cond, thn, els], parseInner, _e, parseCond): Stmt => ({
+      kind: "ifelse",
+      cond: parseCond(cond),
+      then: parseInner(thn),
+      else: parseInner(els),
+    }),
+  };
+}
+function patComment(re: RegExp): LangPattern {
+  return { regex: re, build: (): Stmt => ({ kind: "noop" }) };
+}
 
 // ---------- English ----------
 const english: LanguagePack = {
