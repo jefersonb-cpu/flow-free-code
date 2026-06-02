@@ -819,13 +819,15 @@ const EXTRAS: Record<string, Extras> = {
   },
 };
 
-for (const pack of [english, spanish, french, german, italian, portuguese, japanese, chinese]) {
+const proseBases = [english, spanish, french, german, italian, portuguese, japanese, chinese];
+for (const pack of proseBases) {
   const x = EXTRAS[pack.id];
   if (!x) continue;
   (pack.operators as Record<string, string[]>)["%"] = x.modulo;
   // Prepend new patterns so they're tried before older, broader regexes.
   pack.patterns = [...x.patterns, ...pack.patterns];
 }
+
 
 // ---------- TypeScript ----------
 // Real code syntax. Statements are one-per-line; trailing `;` optional.
