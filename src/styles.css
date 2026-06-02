@@ -51,9 +51,36 @@
   );
 }
 
+/* Light theme (default) — warm parchment */
 :root {
   --radius: 0.5rem;
-  /* Warm parchment-on-ink palette. */
+  --background: oklch(0.975 0.012 75);
+  --foreground: oklch(0.2 0.02 60);
+  --parchment: oklch(0.975 0.012 75);
+  --ink: oklch(0.2 0.02 60);
+  --card: oklch(0.99 0.008 75);
+  --card-foreground: oklch(0.2 0.02 60);
+  --popover: oklch(0.99 0.008 75);
+  --popover-foreground: oklch(0.2 0.02 60);
+  --primary: oklch(0.6 0.17 55);
+  --primary-foreground: oklch(0.98 0.01 75);
+  --secondary: oklch(0.93 0.015 70);
+  --secondary-foreground: oklch(0.22 0.02 60);
+  --muted: oklch(0.94 0.012 70);
+  --muted-foreground: oklch(0.46 0.02 65);
+  --accent: oklch(0.55 0.14 210);
+  --accent-foreground: oklch(0.98 0.01 200);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --success: oklch(0.55 0.16 150);
+  --success-foreground: oklch(0.98 0 0);
+  --border: oklch(0.88 0.015 70);
+  --input: oklch(0.93 0.012 70);
+  --ring: oklch(0.6 0.17 55);
+}
+
+/* Dark theme — warm parchment-on-ink */
+.dark {
   --background: oklch(0.18 0.018 60);
   --foreground: oklch(0.94 0.02 75);
   --parchment: oklch(0.94 0.025 75);
@@ -83,13 +110,26 @@
   * {
     border-color: var(--color-border);
   }
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
   body {
     background-color: var(--color-background);
     background-image: var(--gradient-aurora);
     color: var(--color-foreground);
     font-family: var(--font-sans);
-    min-height: 100vh;
+    min-height: 100dvh;
   }
   .font-serif { font-family: var(--font-serif); }
   .font-mono { font-family: var(--font-mono); }
+
+  /* Visible keyboard focus on every interactive element */
+  :where(button, a, [role="button"], input, textarea, select, summary):focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
 }
