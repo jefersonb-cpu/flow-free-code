@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Play, Sparkles, BookOpen, RotateCcw } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Play, Sparkles, BookOpen, RotateCcw, Search } from "lucide-react";
 import { LANGUAGES, getLanguage } from "@/lib/prose-lang/languages";
 import { run, type RunResult } from "@/lib/prose-lang/interpreter";
 
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Write programs as coherent sentences in English, Spanish, French, German, or Italian. Each sentence is a real command.",
+          "Write programs as coherent sentences in 8 human languages — English, Spanish, French, German, Italian, Portuguese, Japanese, Chinese. Each sentence is a real command.",
       },
       { property: "og:title", content: "Prosa — Code in plain language" },
       {
