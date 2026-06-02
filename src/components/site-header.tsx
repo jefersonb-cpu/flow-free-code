@@ -35,6 +35,13 @@ export function SiteHeader() {
           >
             Browse
           </Link>
+          <Link
+            to="/pricing"
+            className="hidden text-sm text-muted-foreground hover:text-foreground sm:inline"
+            activeProps={{ className: "hidden text-sm text-foreground sm:inline" }}
+          >
+            Pricing
+          </Link>
           {isAuthenticated && (
             <>
               <Link

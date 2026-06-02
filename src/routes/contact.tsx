@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/contact")({
@@ -19,14 +21,25 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
+  const { user } = useAuth();
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const fd = new FormData(e.currentTarget);
     setSubmitting(true);
-    // Demo: client-side only. Wire to a server function or email service when ready.
-    await new Promise((r) => setTimeout(r, 600));
+    const { error } = await supabase.from("contact_messages").insert({
+      user_id: user?.id ?? null,
+      name: String(fd.get("name") ?? "").trim(),
+      email: String(fd.get("email") ?? "").trim(),
+      subject: String(fd.get("subject") ?? "").trim(),
+      message: String(fd.get("message") ?? "").trim(),
+    });
     setSubmitting(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     (e.target as HTMLFormElement).reset();
     toast.success("Thanks — we'll be in touch within two business days.");
   };
@@ -42,20 +55,20 @@ function ContactPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" name="name" required />
+            <Input id="name" name="name" required maxLength={200} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" required />
+            <Input id="email" name="email" type="email" required defaultValue={user?.email ?? ""} />
           </div>
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="subject">Subject</Label>
-          <Input id="subject" name="subject" required />
+          <Input id="subject" name="subject" required maxLength={200} />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="message">Message</Label>
-          <Textarea id="message" name="message" rows={6} required />
+          <Textarea id="message" name="message" rows={6} required maxLength={5000} />
         </div>
         <Button type="submit" disabled={submitting}>
           {submitting ? "Sending…" : "Send message"}
