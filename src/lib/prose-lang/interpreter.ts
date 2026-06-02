@@ -62,17 +62,18 @@ export function makeExprParser(lang: LanguagePack) {
     return out.map((s) => s.trim()).filter(Boolean);
   }
 
-  // Find op match outside parens/quotes; returns earliest match index (left-assoc by recursing right).
+  // Find op match outside parens/quotes. Replaces non-relevant chars with 'X'
+  // (not whitespace) to preserve indices while preventing spurious matches.
   function findOpSplit(text: string): { index: number; len: number; phrase: string } | null {
     let depth = 0, quote: string | null = null;
     const mask = text.split("");
     for (let i = 0; i < text.length; i++) {
       const c = text[i];
-      if (quote) { if (c === quote && text[i - 1] !== "\\") quote = null; mask[i] = " "; continue; }
-      if (c === '"' || c === "'") { quote = c; mask[i] = " "; continue; }
-      if (c === "(" || c === "[") { depth++; mask[i] = " "; continue; }
-      if (c === ")" || c === "]") { depth--; mask[i] = " "; continue; }
-      if (depth > 0) mask[i] = " ";
+      if (quote) { if (c === quote && text[i - 1] !== "\\") quote = null; mask[i] = "X"; continue; }
+      if (c === '"' || c === "'") { quote = c; mask[i] = "X"; continue; }
+      if (c === "(" || c === "[") { depth++; mask[i] = "X"; continue; }
+      if (c === ")" || c === "]") { depth--; mask[i] = "X"; continue; }
+      if (depth > 0) mask[i] = "X";
     }
     const masked = mask.join("");
     const m = masked.match(opRegex);
