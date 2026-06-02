@@ -38,20 +38,67 @@ function parseLiteral(token: string, lang: LanguagePack): Expr | null {
 
 export function makeExprParser(lang: LanguagePack) {
   // Build a single regex of all operator phrases, longest first.
-  const opEntries: Array<[string, "+" | "-" | "*" | "/" | "%"]> = [];
-  (Object.keys(lang.operators) as Array<"+" | "-" | "*" | "/" | "%">).forEach((op) => {
+  const opEntries: Array<[string, "+" | "-" | "*" | "/" | "%" | "**" | "//"]> = [];
+  (Object.keys(lang.operators) as Array<"+" | "-" | "*" | "/" | "%" | "**" | "//">).forEach((op) => {
     for (const phrase of lang.operators[op] ?? []) opEntries.push([phrase, op]);
   });
   opEntries.sort((a, b) => b[0].length - a[0].length);
-  const opRegex = new RegExp(
-    "\\s+(" + opEntries.map(([p]) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")\\s+",
-    "i",
-  );
+  const opAlt = opEntries.map(([p]) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+  const opRegex = new RegExp("\\s+(" + opAlt + ")\\s+", "i");
+
+  // Split on top-level commas, ignoring those nested in parens / brackets / quotes.
+  function splitTopLevelCommas(text: string): string[] {
+    const out: string[] = [];
+    let depth = 0, quote: string | null = null, start = 0;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (quote) { if (c === quote && text[i - 1] !== "\\") quote = null; continue; }
+      if (c === '"' || c === "'") { quote = c; continue; }
+      if (c === "(" || c === "[") depth++;
+      else if (c === ")" || c === "]") depth--;
+      else if (c === "," && depth === 0) { out.push(text.slice(start, i)); start = i + 1; }
+    }
+    out.push(text.slice(start));
+    return out.map((s) => s.trim()).filter(Boolean);
+  }
+
+  // Find op match outside parens/quotes; returns earliest match index (left-assoc by recursing right).
+  function findOpSplit(text: string): { index: number; len: number; phrase: string } | null {
+    let depth = 0, quote: string | null = null;
+    const mask = text.split("");
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (quote) { if (c === quote && text[i - 1] !== "\\") quote = null; mask[i] = " "; continue; }
+      if (c === '"' || c === "'") { quote = c; mask[i] = " "; continue; }
+      if (c === "(" || c === "[") { depth++; mask[i] = " "; continue; }
+      if (c === ")" || c === "]") { depth--; mask[i] = " "; continue; }
+      if (depth > 0) mask[i] = " ";
+    }
+    const masked = mask.join("");
+    const m = masked.match(opRegex);
+    if (!m || m.index === undefined) return null;
+    return { index: m.index, len: m[0].length, phrase: m[1] };
+  }
 
   function parseAtom(text: string): Expr {
     const raw = text.trim();
     const lit = parseLiteral(raw, lang);
     if (lit) return lit;
+    // Parenthesized expression
+    if (raw.startsWith("(") && raw.endsWith(")")) {
+      return parse(raw.slice(1, -1));
+    }
+    // Built-in function call:  name(args)  or  Name.method(args)
+    const callMatch = raw.match(/^([A-Za-z_][\w.]*)\s*\((.*)\)\s*$/s);
+    if (callMatch && lang.builtins && lang.builtins[callMatch[1]]) {
+      const args = splitTopLevelCommas(callMatch[2]).map(parse);
+      return { kind: "call", name: callMatch[1], args };
+    }
+    // Property-style call:  expr.length  →  length(expr)
+    const propMatch = raw.match(/^(.+)\.([A-Za-z_]\w*)$/);
+    if (propMatch && lang.builtins && lang.builtins[propMatch[2]]) {
+      return { kind: "call", name: propMatch[2], args: [parse(propMatch[1])] };
+    }
     const t = stripArticles(raw);
     if (isIdent(t)) return { kind: "var", name: t };
     throw new ProseError(`I don't understand the value "${raw}".`);
@@ -59,12 +106,12 @@ export function makeExprParser(lang: LanguagePack) {
 
   function parse(text: string): Expr {
     const trimmed = text.trim().replace(/[.!?]+$/, "");
-    const m = trimmed.match(opRegex);
-    if (!m || m.index === undefined) return parseAtom(trimmed);
-    const phrase = m[1].toLowerCase();
+    const split = findOpSplit(trimmed);
+    if (!split) return parseAtom(trimmed);
+    const phrase = split.phrase.toLowerCase();
     const op = opEntries.find(([p]) => p.toLowerCase() === phrase)![1];
-    const left = trimmed.slice(0, m.index);
-    const right = trimmed.slice(m.index + m[0].length);
+    const left = trimmed.slice(0, split.index);
+    const right = trimmed.slice(split.index + split.len);
     return { kind: "bin", op, left: parseAtom(left), right: parse(right) };
   }
 
