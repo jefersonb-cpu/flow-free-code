@@ -49,7 +49,7 @@ export type LanguagePack = {
   /** Register: formal/normal grammar or casual/slang grammar. */
   register?: LanguageRegister;
   /** Operators in expressions: { "+": ["plus"], "-": ["minus"], ... } */
-  operators: Record<BinOp, string[]>;
+  operators: Partial<Record<BinOp, string[]>> & Record<"+" | "-" | "*" | "/", string[]>;
   /** Comparators for conditions, longer phrases first. */
   comparators: Array<{ phrase: string; op: Cond["op"] }>;
   /** Word forms of "true" / "false". */
