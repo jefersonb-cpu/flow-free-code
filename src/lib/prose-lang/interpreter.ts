@@ -9,12 +9,16 @@ export class ProseError extends Error {
 const isIdent = (s: string) => /^[A-Za-zÀ-ÿ_][A-Za-zÀ-ÿ0-9_]*$/.test(s);
 
 // Leading articles across supported languages — stripped before resolving an identifier.
-const ARTICLE_RE = /^(?:the|a|an|el|la|los|las|un|una|le|les|l'|un|une|der|die|das|den|dem|des|ein|eine|einen|einem|einer|il|lo|gli|i|uno)\s+/i;
+const ARTICLE_RE = /^(?:the|a|an|el|la|los|las|un|una|le|les|l'|une|der|die|das|den|dem|des|ein|eine|einen|einem|einer|il|lo|gli|i|uno|o|os|as|um|uma)\s+/i;
+// Trailing particles (Japanese / Chinese) — also stripped when resolving an identifier.
+const TRAILING_PARTICLE_RE = /\s*(?:を|は|が|に|の|へ|で|と|から|まで|より|や|も|的|了|呢|吧|啊)\s*$/;
 
 function stripArticles(s: string): string {
   let t = s.trim();
   while (true) {
-    const next = t.replace(ARTICLE_RE, "").trim();
+    const a = t.replace(ARTICLE_RE, "");
+    const b = a.replace(TRAILING_PARTICLE_RE, "");
+    const next = b.trim();
     if (next === t) return t;
     t = next;
   }
