@@ -996,12 +996,21 @@ for i in range(5): counter += 1
 print(counter)
 if counter > 3: print("big number!")
 counter *= 2
+power = counter ** 2
+print("squared: " + str(power))
+half = 17 // 5
+print("floor div: " + str(half))
+print("abs: " + str(abs(-7)))
+name = "hello"
+print("len: " + str(len(name)))
+print(upper(name))
 while counter < 50: counter += 10
-print("final: " + counter)`,
-  operators: codeOperators,
+print("final: " + str(counter))`,
+  operators: { ...codeOperators, "//": ["//"] },
   comparators: codeComparators,
   truthy: ["true", "True"],
   falsy: ["false", "False"],
+  builtins: pyBuiltins,
   patterns: [
     // Comments
     patComment(/^\s*#.*$/),
