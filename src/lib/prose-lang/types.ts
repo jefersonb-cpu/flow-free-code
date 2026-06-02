@@ -1,11 +1,12 @@
 export type Value = number | string | boolean;
 
-export type BinOp = "+" | "-" | "*" | "/" | "%";
+export type BinOp = "+" | "-" | "*" | "/" | "%" | "**" | "//";
 
 export type Expr =
   | { kind: "lit"; value: Value }
   | { kind: "var"; name: string }
-  | { kind: "bin"; op: BinOp; left: Expr; right: Expr };
+  | { kind: "bin"; op: BinOp; left: Expr; right: Expr }
+  | { kind: "call"; name: string; args: Expr[] };
 
 export type Cond = {
   op: ">" | "<" | "==" | ">=" | "<=" | "!=";
