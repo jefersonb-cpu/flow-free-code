@@ -6,7 +6,8 @@ export class ProseError extends Error {
   }
 }
 
-const isIdent = (s: string) => /^[A-Za-zÀ-ÿ_][A-Za-zÀ-ÿ0-9_]*$/.test(s);
+const isIdent = (s: string) =>
+  /^[A-Za-zÀ-ÿ_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF][A-Za-zÀ-ÿ0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]*$/.test(s);
 
 // Leading articles across supported languages — stripped before resolving an identifier.
 const ARTICLE_RE = /^(?:the|a|an|el|la|los|las|un|una|le|les|l'|une|der|die|das|den|dem|des|ein|eine|einen|einem|einer|il|lo|gli|i|uno|o|os|as|um|uma)\s+/i;
