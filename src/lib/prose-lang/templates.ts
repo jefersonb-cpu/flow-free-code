@@ -135,8 +135,8 @@ If guess is not equal to secret, then say "Try again.".`,
     description: "Built-in isPrime() over a value.",
     language: "en",
     source: `Let n be 29.
-If isPrime(n), then print n plus " is prime".
-If not(isPrime(n)), then print n plus " is composite".`,
+If isPrime(n) is true, then print n plus " is prime".
+If isPrime(n) is false, then print n plus " is composite".`,
   },
   {
     id: "countdown",
