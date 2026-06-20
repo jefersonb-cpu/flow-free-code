@@ -351,6 +351,39 @@ function Index() {
             </div>
 
             <div className="mt-4 rounded-xl border border-border bg-card/60 p-6">
+              <div className="mb-3 flex items-center gap-2">
+                <FileCode className="h-4 w-4 text-primary" aria-hidden="true" />
+                <h3 className="font-serif text-xl">Code templates</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Load a ready-made program. Templates use English prose; the language switches to 🇬🇧 English.
+              </p>
+              <ul className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                {TEMPLATES.map((t) => (
+                  <li key={t.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (baseId !== "en" || register !== "normal") {
+                          setBaseId("en");
+                          setRegister("normal");
+                        }
+                        setSource(t.source);
+                        setResult(null);
+                        toast.success(`Loaded "${t.name}".`);
+                      }}
+                      title={t.description}
+                      className="flex w-full items-center gap-2 rounded-md border border-border bg-card px-2.5 py-2 text-left text-xs text-foreground transition hover:border-primary/50 hover:bg-card/80"
+                    >
+                      <span aria-hidden="true">{t.emoji}</span>
+                      <span className="truncate">{t.name}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-4 rounded-xl border border-border bg-card/60 p-6">
               <h3 className="font-serif text-xl">Try these</h3>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li>· Change a sentence and re-run.</li>
