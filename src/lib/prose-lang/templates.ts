@@ -142,10 +142,13 @@ If not(isPrime(n)), then print n plus " is composite".`,
     id: "countdown",
     name: "Countdown",
     emoji: "🚀",
-    description: "Decreasing loop using while.",
+    description: "Sequential print sentences.",
     language: "en",
-    source: `Let t be 5.
-Repeat 5 times: print t, then reduce t by 1.
+    source: `Print 5.
+Print 4.
+Print 3.
+Print 2.
+Print 1.
 Print "Lift off!".`,
   },
   {
