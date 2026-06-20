@@ -4,35 +4,38 @@ export const Route = createFileRoute("/security")({
   head: () => ({
     meta: [
       { title: "Security — Prosa" },
-      { name: "description", content: "How we keep your account, code, and data safe on Prosa." },
+      { name: "description", content: "A plain account of what Prosa does — and doesn't — do to protect your data." },
       { property: "og:title", content: "Security — Prosa" },
-      { property: "og:description", content: "Our security posture: 2FA, rate limiting, encryption, and disclosure." },
+      { property: "og:description", content: "What's actually implemented today, and what isn't." },
     ],
   }),
   component: SecurityPage,
 });
 
-const items = [
+const implemented = [
   {
-    title: "Two-factor authentication",
-    body: "Enable TOTP-based 2FA from your profile. We recommend Authy, 1Password, or any RFC 6238 app.",
+    title: "Account authentication",
+    body: "Email + password sign-in handled by our managed auth provider. Passwords are never stored in plaintext.",
   },
   {
-    title: "Rate limiting",
-    body: "Login, signup, and snippet write endpoints are rate limited per IP and per account to deter brute-force and abuse.",
+    title: "Row-level security on the database",
+    body: "Every user-owned table has RLS policies so one account can only read or modify rows that belong to it. Public snippets are the explicit exception.",
   },
   {
-    title: "Encryption",
-    body: "All traffic is TLS 1.3. Data at rest is AES-256 encrypted by our managed database provider.",
+    title: "HTTPS in transit",
+    body: "All traffic to the hosted app is served over TLS by the platform host.",
   },
   {
-    title: "Row-level security",
-    body: "Every table enforces row-level security so a user can only ever read or modify their own private data.",
+    title: "Private snippets by default",
+    body: "New snippets are private until you set their visibility to public.",
   },
-  {
-    title: "Responsible disclosure",
-    body: "Found a vulnerability? Email security@prosa.example. We acknowledge within 48 hours and credit reporters.",
-  },
+];
+
+const notYet = [
+  "Two-factor authentication (planned, not built)",
+  "Application-level rate limiting (relies on host defaults today)",
+  "A formal vulnerability disclosure program",
+  "SOC 2 / ISO 27001 certifications",
 ];
 
 function SecurityPage() {
@@ -40,16 +43,41 @@ function SecurityPage() {
     <main className="mx-auto max-w-3xl px-4 py-12 sm:px-8">
       <header className="mb-10">
         <h1 className="font-serif text-4xl tracking-tight text-foreground">Security</h1>
-        <p className="mt-2 text-muted-foreground">The controls and practices that keep Prosa trustworthy.</p>
+        <p className="mt-2 text-muted-foreground">
+          Prosa is an early project. Here is exactly what is in place today — no more, no less.
+        </p>
       </header>
-      <div className="space-y-4">
-        {items.map((it) => (
-          <section key={it.title} className="rounded-lg border border-border/60 p-5">
-            <h2 className="font-medium text-foreground">{it.title}</h2>
-            <p className="mt-1.5 text-sm text-muted-foreground">{it.body}</p>
-          </section>
-        ))}
-      </div>
+
+      <section>
+        <h2 className="font-serif text-2xl text-foreground">What is implemented</h2>
+        <div className="mt-4 space-y-3">
+          {implemented.map((it) => (
+            <article key={it.title} className="rounded-lg border border-border/60 p-5">
+              <h3 className="font-medium text-foreground">{it.title}</h3>
+              <p className="mt-1.5 text-sm text-muted-foreground">{it.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="font-serif text-2xl text-foreground">Not in place yet</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          We'd rather list these honestly than pretend they exist.
+        </p>
+        <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+          {notYet.map((n) => (
+            <li key={n} className="flex gap-2">
+              <span aria-hidden="true">·</span>
+              <span>{n}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <p className="mt-10 text-xs text-muted-foreground">
+        Found something concerning? Use the contact page — we read everything.
+      </p>
     </main>
   );
 }
