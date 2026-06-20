@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Play, Sparkles, BookOpen, RotateCcw, Search, Save } from "lucide-react";
+import { Play, Sparkles, BookOpen, RotateCcw, Search, Save, FileCode } from "lucide-react";
 import { BASE_LANGUAGES, getVariant } from "@/lib/prose-lang/languages";
+import { TEMPLATES } from "@/lib/prose-lang/templates";
 import { run, type RunResult } from "@/lib/prose-lang/interpreter";
 import { useAuth } from "@/lib/auth-context";
 import { createSnippet, recordRun } from "@/lib/snippets";
@@ -350,6 +351,39 @@ function Index() {
             </div>
 
             <div className="mt-4 rounded-xl border border-border bg-card/60 p-6">
+              <div className="mb-3 flex items-center gap-2">
+                <FileCode className="h-4 w-4 text-primary" aria-hidden="true" />
+                <h3 className="font-serif text-xl">Code templates</h3>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Load a ready-made program. Templates use English prose; the language switches to 🇬🇧 English.
+              </p>
+              <ul className="mt-3 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                {TEMPLATES.map((t) => (
+                  <li key={t.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (baseId !== "en" || register !== "normal") {
+                          setBaseId("en");
+                          setRegister("normal");
+                        }
+                        setSource(t.source);
+                        setResult(null);
+                        toast.success(`Loaded "${t.name}".`);
+                      }}
+                      title={t.description}
+                      className="flex w-full items-center gap-2 rounded-md border border-border bg-card px-2.5 py-2 text-left text-xs text-foreground transition hover:border-primary/50 hover:bg-card/80"
+                    >
+                      <span aria-hidden="true">{t.emoji}</span>
+                      <span className="truncate">{t.name}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="mt-4 rounded-xl border border-border bg-card/60 p-6">
               <h3 className="font-serif text-xl">Try these</h3>
               <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                 <li>· Change a sentence and re-run.</li>
@@ -441,10 +475,13 @@ function Cheatsheet({ langId, query = "" }: { langId: string; query?: string }) 
   // Call style: `name(args)` or `receiver.method(args)`; `x.length` is sugar for `length(x)`.
   const sharedExtras: Array<[string, string]> = [
     ["Power & floor div", `2 ** 8       (exponent)\n17 // 5      (floor division)`],
-    ["Math functions", `Math.abs(-7)   /   Math.floor(3.9)   /   Math.ceil(0.1)\nMath.max(1, 9) /   Math.min(2, 5)   /   Math.sqrt(16)\nMath.round(2.6) /  Math.pow(2, 8)   /   Math.random()`],
+    ["Math functions", `Math.abs(-7)   /   Math.floor(3.9)   /   Math.ceil(0.1)\nMath.max(1, 9) /   Math.min(2, 5)   /   Math.sqrt(16)\nMath.round(2.6) /  Math.pow(2, 8)   /   Math.random()\nMath.PI()      /   sin(x)  cos(x)  tan(x)  hypot(3,4)\nlog(x)  log2(x)  log10(x)  exp(x)  sign(x)`],
+    ["Numbers & ranges", `clamp(x, 0, 10)    /   lerp(a, b, 0.5)\nmod(x, 3)          /   toFixed(3.14159, 2)\nrand()             /   randInt(1, 6)\ndeg(rad)           /   rad(deg)`],
+    ["Number theory", `factorial(6)   /   fib(20)   /   isPrime(29)\ngcd(12, 18)    /   lcm(4, 6)\nisEven(n)      /   isOdd(n)`],
     ["Type casting", `Number("42")   /   String(7)        /   Boolean(0)\nparseInt("12") /   parseFloat("3.14") / isNaN(x)\nint("42")      /   float("3.14")    /   str(7)   /   bool(1)`],
-    ["String methods", `"hello".toUpperCase()   /   name.toLowerCase()\n"  hi  ".trim()         /   name.length\nupper(name)             /   lower(name)   /   len(name)`],
-    ["Aggregates", `sum(10, 20, 30)    (variadic sum)`],
+    ["String methods", `"hello".toUpperCase()   /   name.toLowerCase()\n"  hi  ".trim()         /   name.length\nupper(name)             /   lower(name)   /   len(name)\nreverse("abc")          /   repeat("ab", 3)\nstartsWith(s, "he")     /   endsWith(s, "lo")\nincludes(s, "ll")       /   replace(s, "l", "L")\nslice(s, 1, 4)          /   charAt(s, 0)\npadStart("7", 3, "0")   /   padEnd("x", 4, ".")\ncapitalize("ada")       /   title("hello world")\nwordCount(s)            /   charCount(s)`],
+    ["Aggregates", `sum(10, 20, 30)    /   avg(10, 20, 30)   /   mean(...)`],
+    ["Logic & time", `not(x)        (boolean negation)\nnow()         (epoch ms)\ntoday()       (YYYY-MM-DD)`],
   ];
 
   const q = query.trim().toLowerCase();

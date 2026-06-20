@@ -1049,13 +1049,102 @@ print("final: " + str(counter))`,
   p.register = "normal";
 });
 
+// ---------- Extra preset built-ins (available in every language) ----------
+const extraBuiltins: Record<string, (a: Value[]) => Value> = {
+  // Math extras
+  log: (a) => Math.log(num(a[0])),
+  log2: (a) => Math.log2(num(a[0])),
+  log10: (a) => Math.log10(num(a[0])),
+  exp: (a) => Math.exp(num(a[0])),
+  sin: (a) => Math.sin(num(a[0])),
+  cos: (a) => Math.cos(num(a[0])),
+  tan: (a) => Math.tan(num(a[0])),
+  asin: (a) => Math.asin(num(a[0])),
+  acos: (a) => Math.acos(num(a[0])),
+  atan: (a) => Math.atan(num(a[0])),
+  atan2: (a) => Math.atan2(num(a[0]), num(a[1])),
+  hypot: (a) => Math.hypot(...a.map(num)),
+  sign: (a) => Math.sign(num(a[0])),
+  mod: (a) => ((num(a[0]) % num(a[1])) + num(a[1])) % num(a[1]),
+  clamp: (a) => Math.min(Math.max(num(a[0]), num(a[1])), num(a[2])),
+  lerp: (a) => num(a[0]) + (num(a[1]) - num(a[0])) * num(a[2]),
+  avg: (a) => a.reduce<number>((s, v) => s + num(v), 0) / Math.max(a.length, 1),
+  mean: (a) => a.reduce<number>((s, v) => s + num(v), 0) / Math.max(a.length, 1),
+  rand: () => Math.random(),
+  randInt: (a) => {
+    const lo = Math.ceil(num(a[0]));
+    const hi = Math.floor(num(a[1]));
+    return Math.floor(Math.random() * (hi - lo + 1)) + lo;
+  },
+  factorial: (a) => {
+    const n = Math.max(0, Math.trunc(num(a[0])));
+    let r = 1;
+    for (let i = 2; i <= n; i++) r *= i;
+    return r;
+  },
+  gcd: (a) => {
+    const f = (x: number, y: number): number => (y === 0 ? Math.abs(x) : f(y, x % y));
+    return a.map(num).reduce((acc, v) => f(acc, v));
+  },
+  lcm: (a) => {
+    const g = (x: number, y: number): number => (y === 0 ? Math.abs(x) : g(y, x % y));
+    return a.map(num).reduce((acc, v) => Math.abs(acc * v) / g(acc, v));
+  },
+  fib: (a) => {
+    const n = Math.max(0, Math.trunc(num(a[0])));
+    let x = 0, y = 1;
+    for (let i = 0; i < n; i++) { const t = x + y; x = y; y = t; }
+    return x;
+  },
+  isPrime: (a) => {
+    const n = Math.trunc(num(a[0]));
+    if (n < 2) return false;
+    for (let i = 2; i * i <= n; i++) if (n % i === 0) return false;
+    return true;
+  },
+  isEven: (a) => num(a[0]) % 2 === 0,
+  isOdd: (a) => num(a[0]) % 2 !== 0,
+  deg: (a) => (num(a[0]) * 180) / Math.PI,
+  rad: (a) => (num(a[0]) * Math.PI) / 180,
+  toFixed: (a) => Number(num(a[0]).toFixed(num(a[1] ?? 2))),
+  // String extras
+  reverse: (a) => String(a[0]).split("").reverse().join(""),
+  repeat: (a) => String(a[0]).repeat(Math.max(0, Math.trunc(num(a[1])))),
+  startsWith: (a) => String(a[0]).startsWith(String(a[1])),
+  endsWith: (a) => String(a[0]).endsWith(String(a[1])),
+  includes: (a) => String(a[0]).includes(String(a[1])),
+  contains: (a) => String(a[0]).includes(String(a[1])),
+  indexOf: (a) => String(a[0]).indexOf(String(a[1])),
+  replace: (a) => String(a[0]).split(String(a[1])).join(String(a[2])),
+  slice: (a) => String(a[0]).slice(num(a[1]), a[2] != null ? num(a[2]) : undefined),
+  charAt: (a) => String(a[0]).charAt(num(a[1])),
+  padStart: (a) => String(a[0]).padStart(num(a[1]), a[2] != null ? String(a[2]) : " "),
+  padEnd: (a) => String(a[0]).padEnd(num(a[1]), a[2] != null ? String(a[2]) : " "),
+  capitalize: (a) => {
+    const s = String(a[0]);
+    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+  },
+  title: (a) =>
+    String(a[0])
+      .split(/\s+/)
+      .map((w) => (w ? w[0].toUpperCase() + w.slice(1).toLowerCase() : ""))
+      .join(" "),
+  wordCount: (a) => String(a[0]).trim().split(/\s+/).filter(Boolean).length,
+  charCount: (a) => String(a[0]).length,
+  // Misc
+  now: () => Date.now(),
+  today: () => new Date().toISOString().slice(0, 10),
+  not: (a) => !a[0],
+};
+
 // ---------- Integrate built-ins + extra operators into every prose language ----------
-// Every natural-language pack gets the union of TypeScript + Python built-ins
-// (callable as `name(args)` or `receiver.method(args)`) and the `**` / `//` operators.
 const sharedBuiltins: Record<string, (a: Value[]) => Value> = {
   ...tsBuiltins,
   ...pyBuiltins,
+  ...extraBuiltins,
 };
+typescript.builtins = { ...(typescript.builtins ?? {}), ...extraBuiltins };
+python.builtins = { ...(python.builtins ?? {}), ...extraBuiltins };
 for (const pack of proseBases) {
   pack.builtins = { ...(pack.builtins ?? {}), ...sharedBuiltins };
   (pack.operators as Record<string, string[]>)["**"] = ["**"];
