@@ -5,9 +5,9 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About — Prosa" },
-      { name: "description", content: "Why we built Prosa: programming should be readable in any human language." },
+      { name: "description", content: "What Prosa is, what it isn't, and why it exists." },
       { property: "og:title", content: "About — Prosa" },
-      { property: "og:description", content: "The story behind a deterministic, multilingual programming runtime." },
+      { property: "og:description", content: "A small, honest natural-language programming experiment." },
     ],
   }),
   component: AboutPage,
@@ -19,32 +19,27 @@ function AboutPage() {
       <header className="mb-8">
         <h1 className="font-serif text-4xl tracking-tight text-foreground">About Prosa</h1>
         <p className="mt-3 text-lg text-muted-foreground">
-          Programming should read like the language you think in.
+          A small experiment in writing programs as ordinary sentences.
         </p>
       </header>
 
       <section className="space-y-5 text-muted-foreground">
         <p>
-          Prosa began as a side experiment: could everyday prose — written in English, Spanish, or Japanese — be parsed
-          deterministically into runnable code? Three years later, the answer is yes.
+          Prosa is a hobby project. It started as a question: can a fixed grammar parse plain
+          sentences — in English, Spanish, Japanese, and a handful of other languages — into
+          deterministic, runnable code? No AI, no probabilistic guessing. Just pattern matching
+          and a tiny tree-walking interpreter.
         </p>
         <p>
-          We're a small team of linguists and compiler engineers building tools that meet people where they are. No models, no
-          guessing. Just a clear grammar and a fast interpreter.
+          What runs today: an in-browser editor, eight base languages with a casual "slang"
+          register for each, a small library of built-in math and string helpers, and accounts so
+          you can save and share snippets. That's it.
         </p>
-      </section>
-
-      <section className="mt-12 grid gap-6 sm:grid-cols-3">
-        {[
-          { n: "8", l: "human languages" },
-          { n: "12k+", l: "snippets shared" },
-          { n: "100%", l: "deterministic" },
-        ].map((s) => (
-          <div key={s.l} className="rounded-lg border border-border/60 p-5">
-            <p className="font-serif text-3xl text-foreground">{s.n}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{s.l}</p>
-          </div>
-        ))}
+        <p>
+          What is <em>not</em> true: there is no team of linguists, no enterprise customers, no
+          published case studies. If you see a marketing-sounding claim anywhere on the site
+          that we haven't backed up, please tell us — we'll fix it.
+        </p>
       </section>
 
       <div className="mt-12 flex gap-3">
