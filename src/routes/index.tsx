@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Play, Sparkles, BookOpen, RotateCcw, Search, Save } from "lucide-react";
+import { Play, Sparkles, BookOpen, RotateCcw, Search, Save, FileCode } from "lucide-react";
 import { BASE_LANGUAGES, getVariant } from "@/lib/prose-lang/languages";
+import { TEMPLATES } from "@/lib/prose-lang/templates";
 import { run, type RunResult } from "@/lib/prose-lang/interpreter";
 import { useAuth } from "@/lib/auth-context";
 import { createSnippet, recordRun } from "@/lib/snippets";
