@@ -31,12 +31,9 @@ Print "Final count: " plus counter.`,
     id: "sum1to100",
     name: "Sum 1..100",
     emoji: "➕",
-    description: "Gauss-style running sum using a loop.",
+    description: "Closed-form Gauss formula.",
     language: "en",
-    source: `Let total be 0.
-Let i be 0.
-Repeat 100 times: increase i by 1.
-Set total to 100 times 101 divided by 2.
+    source: `Set total to 100 times 101 divided by 2.
 Print "Sum of 1..100 is " plus total.`,
   },
   {
@@ -51,12 +48,12 @@ Print "factorial of " plus n plus " is " plus result.`,
   },
   {
     id: "fibonacci",
-    name: "Fibonacci sequence",
+    name: "Fibonacci number",
     emoji: "🌀",
-    description: "Prints the first 12 Fibonacci numbers.",
+    description: "The 20th Fibonacci number via fib().",
     language: "en",
-    source: `Let i be 0.
-Repeat 12 times: increase i by 1, then print fib(i).`,
+    source: `Let n be 20.
+Print "fib(" plus n plus ") = " plus fib(n).`,
   },
   {
     id: "evenodd",
