@@ -475,10 +475,13 @@ function Cheatsheet({ langId, query = "" }: { langId: string; query?: string }) 
   // Call style: `name(args)` or `receiver.method(args)`; `x.length` is sugar for `length(x)`.
   const sharedExtras: Array<[string, string]> = [
     ["Power & floor div", `2 ** 8       (exponent)\n17 // 5      (floor division)`],
-    ["Math functions", `Math.abs(-7)   /   Math.floor(3.9)   /   Math.ceil(0.1)\nMath.max(1, 9) /   Math.min(2, 5)   /   Math.sqrt(16)\nMath.round(2.6) /  Math.pow(2, 8)   /   Math.random()`],
+    ["Math functions", `Math.abs(-7)   /   Math.floor(3.9)   /   Math.ceil(0.1)\nMath.max(1, 9) /   Math.min(2, 5)   /   Math.sqrt(16)\nMath.round(2.6) /  Math.pow(2, 8)   /   Math.random()\nMath.PI()      /   sin(x)  cos(x)  tan(x)  hypot(3,4)\nlog(x)  log2(x)  log10(x)  exp(x)  sign(x)`],
+    ["Numbers & ranges", `clamp(x, 0, 10)    /   lerp(a, b, 0.5)\nmod(x, 3)          /   toFixed(3.14159, 2)\nrand()             /   randInt(1, 6)\ndeg(rad)           /   rad(deg)`],
+    ["Number theory", `factorial(6)   /   fib(20)   /   isPrime(29)\ngcd(12, 18)    /   lcm(4, 6)\nisEven(n)      /   isOdd(n)`],
     ["Type casting", `Number("42")   /   String(7)        /   Boolean(0)\nparseInt("12") /   parseFloat("3.14") / isNaN(x)\nint("42")      /   float("3.14")    /   str(7)   /   bool(1)`],
-    ["String methods", `"hello".toUpperCase()   /   name.toLowerCase()\n"  hi  ".trim()         /   name.length\nupper(name)             /   lower(name)   /   len(name)`],
-    ["Aggregates", `sum(10, 20, 30)    (variadic sum)`],
+    ["String methods", `"hello".toUpperCase()   /   name.toLowerCase()\n"  hi  ".trim()         /   name.length\nupper(name)             /   lower(name)   /   len(name)\nreverse("abc")          /   repeat("ab", 3)\nstartsWith(s, "he")     /   endsWith(s, "lo")\nincludes(s, "ll")       /   replace(s, "l", "L")\nslice(s, 1, 4)          /   charAt(s, 0)\npadStart("7", 3, "0")   /   padEnd("x", 4, ".")\ncapitalize("ada")       /   title("hello world")\nwordCount(s)            /   charCount(s)`],
+    ["Aggregates", `sum(10, 20, 30)    /   avg(10, 20, 30)   /   mean(...)`],
+    ["Logic & time", `not(x)        (boolean negation)\nnow()         (epoch ms)\ntoday()       (YYYY-MM-DD)`],
   ];
 
   const q = query.trim().toLowerCase();
