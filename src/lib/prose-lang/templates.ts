@@ -62,8 +62,8 @@ Print "fib(" plus n plus ") = " plus fib(n).`,
     description: "Conditional branching with isEven().",
     language: "en",
     source: `Let n be 17.
-If isEven(n), then say "even".
-If isOdd(n), then say "odd".`,
+If isEven(n) is true, then say "even".
+If isOdd(n) is true, then say "odd".`,
   },
   {
     id: "fahrenheit",
