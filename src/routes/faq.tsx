@@ -16,27 +16,27 @@ export const Route = createFileRoute("/faq")({
 const faqs = [
   {
     q: "Is Prosa AI?",
-    a: "No. Prosa is a deterministic grammar-based runtime. Programs parse and execute the same way every time — no model, no hallucinations.",
+    a: "No. Prosa is a deterministic grammar-based interpreter. The same input always produces the same output — there is no model and no probabilistic guessing.",
   },
   {
     q: "Which human languages are supported?",
-    a: "English, Spanish, French, German, Portuguese, Italian, Dutch, and Japanese — with more on the way.",
+    a: "Eight base languages: English, Spanish, French, German, Italian, Portuguese, Japanese, and Chinese. Each has a casual 'slang' register as well.",
   },
   {
     q: "Can I run Prosa offline?",
-    a: "Yes. The interpreter is a small JavaScript bundle that runs entirely in your browser.",
+    a: "The interpreter itself is a small JavaScript module that runs entirely in your browser. The hosted editor and snippet storage require an internet connection.",
   },
   {
     q: "Is my code private?",
-    a: "Snippets default to private. You only share them by explicitly setting visibility to public.",
+    a: "Snippets default to private. They only become visible to other users if you explicitly switch the visibility to public.",
   },
   {
     q: "How do I share or fork a snippet?",
-    a: "Open any public snippet and use the Fork button to copy it into your account, or Share to copy a link.",
+    a: "Open any public snippet and use Fork to copy it into your account, or copy the page URL to share it.",
   },
   {
-    q: "Do you offer an API?",
-    a: "A hosted API is on the roadmap. For now, embed the open-source interpreter directly in your project.",
+    q: "Do you offer an API or a paid plan?",
+    a: "Not today. Pricing tiers exist in the app for demonstration only — billing is not connected, and there is no hosted API yet.",
   },
 ];
 
