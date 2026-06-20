@@ -72,7 +72,7 @@ If isOdd(n), then say "odd".`,
     description: "Convert a temperature with arithmetic.",
     language: "en",
     source: `Let f be 98.
-Let c be f minus 32 times 5 divided by 9.
+Let c be (f minus 32) times 5 divided by 9.
 Print f plus "°F is " plus toFixed(c, 1) plus "°C".`,
   },
   {
