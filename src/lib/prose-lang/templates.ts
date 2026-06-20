@@ -79,10 +79,10 @@ Print f plus "°F is " plus toFixed(c, 1) plus "°C".`,
     id: "circle",
     name: "Circle area",
     emoji: "⭕",
-    description: "Use Math.PI and exponentiation.",
+    description: "Use Math.PI() and exponentiation.",
     language: "en",
     source: `Let radius be 5.
-Let area be Math.PI times radius ** 2.
+Let area be Math.PI() times radius ** 2.
 Print "area = " plus toFixed(area, 3).`,
   },
   {
